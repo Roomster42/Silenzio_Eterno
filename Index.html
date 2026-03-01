@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Log Manovre Drone</title>
+    <style>
+        :root {
+            --bg-dark: #12181f;
+            --bg-card: #1c252e;
+            --text-main: #e0e0e0;
+            --accent: #d35400; /* Arancione scuro */
+            --green: #27ae60;
+            --red: #c0392b;
+            --border: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        aside {
+            width: 200px;
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav li {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        nav li.active {
+            background: rgba(211, 84, 0, 0.1);
+            border-left: 3px solid var(--accent);
+            color: var(--accent);
+        }
+
+        /* --- Main Content --- */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 10px 30px;
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* --- Log Table --- */
+        .log-section {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.85em;
+        }
+
+        th {
+            text-align: left;
+            background: #252f3a;
+            padding: 12px;
+            color: #95a5a6;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-ok { color: var(--green); font-weight: bold; }
+        .status-error { 
+            background: rgba(192, 57, 43, 0.2);
+            color: #ff4d4d;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+
+        /* --- Sidebar Widgets --- */
+        .widget {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #0f1419;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+        }
+
+        .telemetry-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <nav>
+            <ul>
+                <li>Dashboard</li>
+                <li class="active">Registro Manovre</li>
+                <li>Mappa Missione</li>
+                <li>Analisi Dati</li>
+                <li>Impostazioni</li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <header>
+            <div>SISTEMA LOG MANOVRE DRONE MILITARE</div>
+            <div>OPERATORE: LUCA ROSSI (ID: LR-771)</div>
+        </header>
+
+        <div class="content-grid">
+            <section class="log-section">
+                <h3>REGISTRO MANOVRE - MISSIONE: OPERAZIONE AQUILA</h3>
+                <table id="logTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>TIMESTAMP (UTC)</th>
+                            <th>TIPO MANOVRA</th>
+                            <th>COORDINATE</th>
+                            <th>ALTITUDINE (m)</th>
+                            <th>STATO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logBody">
+                        </tbody>
+                </table>
+            </section>
+
+            <section class="widgets">
+                <div class="widget">
+                    <h4>MAPPA DELLA MISSIONE</h4>
+                    <div class="map-placeholder">[ MAPPA TATTICA ]</div>
+                </div>
+                <div class="widget">
+                    <h4>TELEMETRIA CORRENTE</h4>
+                    <div class="telemetry-row"><span>Altitudine:</span> <span>1500 m</span></div>
+                    <div class="telemetry-row"><span>Velocità:</span> <span>180 km/h</span></div>
+                    <div class="telemetry-row"><span>Batteria:</span> <span style="color:var(--green)">88%</span></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Funzione per caricare i dati dal file JSON
+        async function loadLogs() {
+            try {
+                const response = await fetch('log_drone.json');
+                const data = await response.json();
+                const tableBody = document.getElementById('logBody');
+
+                data.forEach(entry => {
+                    const row = document.createElement('tr');
+                    
+                    // Applica stile speciale se c'è un'anomalia
+                    const statusClass = entry.stato === 'OK' ? 'status-ok' : 'status-error';
+
+                    row.innerHTML = `
+                        <td>${entry.id}</td>
+                        <td>${entry.timestamp}</td>
+                        <td>${entry.tipo}</td>
+                        <td>${entry.coordinate}</td>
+                        <td>${entry.altitudine}</td>
+                        <td><span class="${statusClass}">${entry.stato}</span></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Errore nel caricamento dei dati:", error);
+            }
+        }
+
+        // Avvia il caricamento al caricamento della pagina
+        window.onload = loadLogs;
+    </script>
+</body>
+</html>
