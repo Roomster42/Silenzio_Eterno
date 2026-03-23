@@ -3,52 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Log Manovre Drone</title>
+    <title>High-Tech Drone Maneuver Log</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #12181f;
-            --bg-card: #1c252e;
-            --text-main: #e0e0e0;
-            --accent: #d35400; /* Arancione scuro */
-            --green: #27ae60;
-            --red: #c0392b;
-            --border: #2c3e50;
+            --bg-dark: #03060a; /* Nero molto profondo con sfumature blu */
+            --bg-card: #08101a; /* Tonalità carta leggermente più chiara */
+            --text-main: #a9b9c9; /* Grigio freddo */
+            --accent: #00ffff; /* Ciano Neon per l'accento principale */
+            --accent-glow: rgba(0, 255, 255, 0.6);
+            --green: #00ff88; /* Verde Acido Neon */
+            --green-glow: rgba(0, 255, 136, 0.5);
+            --red: #ff3333; /* Rosso Elettrico Neon */
+            --red-glow: rgba(255, 51, 51, 0.6);
+            --border: #1a2a3a; /* Blu scuro sottile */
+            --font-main: 'Roboto Mono', monospace;
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-main);
             background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(26, 42, 58, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 42, 58, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px; /* Pattern a griglia esagonale a bassa opacità */
             color: var(--text-main);
             margin: 0;
             display: flex;
             height: 100vh;
+            overflow: hidden;
+            font-size: 0.9em;
         }
 
         /* --- Sidebar --- */
         aside {
-            width: 200px;
+            width: 220px;
             background-color: var(--bg-card);
-            border-right: 1px solid var(--border);
+            border-right: 2px solid var(--border);
             padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
         }
 
-        nav ul {
-            list-style: none;
-            padding: 0;
+        .logo-section {
+            padding: 0 20px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
         }
+
+        .logo-placeholder {
+            width: 50px; height: 50px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--accent-glow);
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .logo-placeholder::after {
+            content: ''; position: absolute; top: 15px; left: 15px; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        nav ul { list-style: none; padding: 0; margin: 0; }
 
         nav li {
-            padding: 15px 20px;
+            padding: 15px 25px;
             cursor: pointer;
-            border-left: 3px solid transparent;
-            font-size: 0.9em;
+            border-left: 4px solid transparent;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            color: #7f8c8d;
+        }
+
+        nav li:hover {
+            color: var(--text-main);
+            background: rgba(26, 42, 58, 0.2);
         }
 
         nav li.active {
-            background: rgba(211, 84, 0, 0.1);
-            border-left: 3px solid var(--accent);
+            background: rgba(0, 255, 255, 0.05);
+            border-left: 4px solid var(--accent);
             color: var(--accent);
+            text-shadow: 0 0 8px var(--accent-glow);
+            font-weight: bold;
         }
 
         /* --- Main Content --- */
@@ -56,31 +98,70 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* Effetto scanner orizzontale molto sottile */
+        main::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+            animation: scanline 6s linear infinite;
+            opacity: 0.2;
+            z-index: 10;
+        }
+
+        @keyframes scanline {
+            0% { top: 0; } 100% { top: 100%; }
         }
 
         header {
-            padding: 10px 30px;
+            padding: 15px 30px;
             background: var(--bg-card);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.85em;
+            border-bottom: 2px solid var(--border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        header .system-id {
+            color: var(--accent);
+            text-shadow: 0 0 5px var(--accent-glow);
+            font-weight: bold;
         }
 
         .content-grid {
             display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            padding: 25px;
             overflow-y: auto;
         }
 
         /* --- Log Table --- */
         .log-section {
             background: var(--bg-card);
-            border-radius: 4px;
+            border-radius: 2px;
+            border: 1px solid var(--border);
             padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        
+        /* Dettaglio angolare decorativo */
+        .log-section::before {
+            content: ''; position: absolute; top: -1px; left: -1px; width: 20px; height: 20px;
+            border-top: 3px solid var(--accent); border-left: 3px solid var(--accent);
+            box-shadow: -2px -2px 5px var(--accent-glow);
+        }
+
+        .log-section h3 {
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            color: #fff;
         }
 
         table {
@@ -92,83 +173,144 @@
 
         th {
             text-align: left;
-            background: #252f3a;
-            padding: 12px;
-            color: #95a5a6;
+            background: rgba(26, 42, 58, 0.4);
+            padding: 15px;
+            color: var(--accent);
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border);
         }
 
         td {
-            padding: 12px;
+            padding: 12px 15px;
             border-bottom: 1px solid var(--border);
         }
 
-        .status-ok { color: var(--green); font-weight: bold; }
+        tr:hover td {
+            background: rgba(0, 255, 255, 0.03);
+            color: #fff;
+        }
+
+        .status-ok { 
+            color: var(--green); 
+            font-weight: bold; 
+            text-shadow: 0 0 5px var(--green-glow);
+        }
+        
         .status-error { 
-            background: rgba(192, 57, 43, 0.2);
-            color: #ff4d4d;
+            background: rgba(255, 51, 51, 0.15);
+            color: var(--red);
             font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 3px;
+            padding: 5px 10px;
+            border-radius: 2px;
+            border: 1px solid var(--red);
+            text-shadow: 0 0 8px var(--red-glow);
+            box-shadow: 0 0 5px var(--red-glow);
         }
 
         /* --- Sidebar Widgets --- */
         .widget {
             background: var(--bg-card);
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 2px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+        }
+
+        .widget h4 {
+            margin-top: 0; margin-bottom: 15px;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-shadow: 0 0 5px var(--accent-glow);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
         }
 
         .map-placeholder {
-            width: 100%;
-            height: 200px;
-            background: #0f1419;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #444;
+            width: 100%; height: 220px;
+            background: #010204;
+            border: 2px solid var(--border);
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        /* Griglia radar decorativa */
+        .map-placeholder::after {
+            content: ''; position: absolute; width: 100%; height: 100%;
+            background-image: 
+                repeating-radial-gradient(circle at center, transparent, transparent 30px, rgba(0, 255, 255, 0.05) 31px),
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 20px 20px, 20px 20px;
         }
 
+        .radar-center {
+            width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Telemetria stilizzata */
         .telemetry-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 0.9em;
+            align-items: center;
+        }
+        
+        .tel-label { color: #7f8c8d; text-transform: uppercase; }
+        .tel-value { color: #fff; font-weight: bold; }
+
+        .battery-bar-container {
+            width: 100%; height: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            margin-top: 5px;
+        }
+        .battery-bar-fill {
+            height: 100%; background: var(--green); width: 88%;
+            box-shadow: 0 0 10px var(--green-glow);
         }
     </style>
 </head>
 <body>
 
     <aside>
+        <div class="logo-section">
+            <div class="logo-placeholder"></div>
+            <div style="font-size:0.7em; color:var(--accent)">UNIT OA-001</div>
+        </div>
         <nav>
             <ul>
                 <li>Dashboard</li>
-                <li class="active">Registro Manovre</li>
-                <li>Mappa Missione</li>
-                <li>Analisi Dati</li>
+                <li class="active">Log Manovre</li>
+                <li>Mappa Tattica</li>
+                <li>Info Drone</li>
                 <li>Impostazioni</li>
             </ul>
         </nav>
+        <div style="margin-top:auto; padding: 20px; font-size: 0.7em; color: #444;">
+            SYS VER: 4.1.2 // SECURED
+        </div>
     </aside>
 
     <main>
         <header>
-            <div>SISTEMA LOG MANOVRE DRONE MILITARE</div>
-            <div>OPERATORE: LUCA ROSSI (ID: LR-771)</div>
+            <div><span class="system-id">></span> SISTEMA LOG MANOVRE UNITÀ AQUILA</div>
+            <div style="font-size:0.8em">
+                OPERATORE: <span style="color:#fff">LUCA ROSSI (LR-771)</span> //
+                <span id="clock" style="color:var(--accent)">10:35:12 UTC</span>
+            </div>
         </header>
 
         <div class="content-grid">
             <section class="log-section">
-                <h3>REGISTRO MANOVRE - MISSIONE: OPERAZIONE AQUILA</h3>
+                <h3>REGISTRO AVANZATO MANOVRE - OA-001</h3>
                 <table id="logTable">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>TIMESTAMP (UTC)</th>
+                            <th>TIMESTAMP</th>
                             <th>TIPO MANOVRA</th>
-                            <th>COORDINATE</th>
-                            <th>ALTITUDINE (m)</th>
+                            <th>COORDINATE (Lat/Lon)</th>
+                            <th>ALT (m)</th>
                             <th>STATO</th>
                         </tr>
                     </thead>
@@ -179,14 +321,28 @@
 
             <section class="widgets">
                 <div class="widget">
-                    <h4>MAPPA DELLA MISSIONE</h4>
-                    <div class="map-placeholder">[ MAPPA TATTICA ]</div>
+                    <h4>VISUALIZZAZIONE TATTICA</h4>
+                    <div class="map-placeholder">
+                        <div class="radar-center"></div>
+                    </div>
                 </div>
                 <div class="widget">
-                    <h4>TELEMETRIA CORRENTE</h4>
-                    <div class="telemetry-row"><span>Altitudine:</span> <span>1500 m</span></div>
-                    <div class="telemetry-row"><span>Velocità:</span> <span>180 km/h</span></div>
-                    <div class="telemetry-row"><span>Batteria:</span> <span style="color:var(--green)">88%</span></div>
+                    <h4>TELEMETRIA DI SISTEMA</h4>
+                    <div class="telemetry-row">
+                        <span class="tel-label">Altitudine:</span> 
+                        <span class="tel-value">1500 M</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="tel-label">Velocità:</span> 
+                        <span class="tel-value">180 KM/H</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="tel-label">Batteria:</span> 
+                        <span class="status-ok">88%</span>
+                    </div>
+                    <div class="battery-bar-container">
+                        <div class="battery-bar-fill"></div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -196,8 +352,11 @@
         // Funzione per caricare i dati dal file JSON
         async function loadLogs() {
             try {
+                // Sostituisci con il percorso reale del tuo file JSON
                 const response = await fetch('log_drone.json');
+                if (!response.ok) throw new Error("Errore nel caricamento del file JSON");
                 const data = await response.json();
+                
                 const tableBody = document.getElementById('logBody');
 
                 data.forEach(entry => {
@@ -208,8 +367,8 @@
 
                     row.innerHTML = `
                         <td>${entry.id}</td>
-                        <td>${entry.timestamp}</td>
-                        <td>${entry.tipo}</td>
+                        <td style="color:#fff">${entry.timestamp}</td>
+                        <td style="text-transform:uppercase">${entry.tipo}</td>
                         <td>${entry.coordinate}</td>
                         <td>${entry.altitudine}</td>
                         <td><span class="${statusClass}">${entry.stato}</span></td>
@@ -218,11 +377,23 @@
                 });
             } catch (error) {
                 console.error("Errore nel caricamento dei dati:", error);
+                document.getElementById('logBody').innerHTML = `<tr><td colspan="6" style="color:var(--red); text-align:center;">ERRORE CARICAMENTO DATI SISTEMA</td></tr>`;
             }
         }
 
-        // Avvia il caricamento al caricamento della pagina
-        window.onload = loadLogs;
+        // Semplice orologio in alto a destra
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toISOString().substring(11, 19) + " UTC";
+            document.getElementById('clock').textContent = timeString;
+        }
+
+        // Avvia le funzioni al caricamento della pagina
+        window.onload = function() {
+            loadLogs();
+            updateClock();
+            setInterval(updateClock, 1000); // Aggiorna l'orologio ogni secondo
+        };
     </script>
 </body>
 </html>
