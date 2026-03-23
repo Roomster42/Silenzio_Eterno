@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AQUILA OA-001 | Tactical Command</title>
+    <title>AQUILA OA-001 | Tactical Command Interface</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -25,7 +25,7 @@
             flex-direction: row;
         }
 
-        /* --- NAVIGAZIONE --- */
+        /* --- NAVIGATION --- */
         aside {
             width: 200px; background: var(--card); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 100;
@@ -39,7 +39,7 @@
 
         .nav-item.active { border-left-color: var(--accent); color: var(--accent); background: rgba(0,255,255,0.05); }
 
-        /* --- LAYOUT PRINCIPALE --- */
+        /* --- MAIN LAYOUT --- */
         main { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
         
         header { 
@@ -52,7 +52,7 @@
         .page { display: none; width: 100%; }
         .page.active { display: block; }
 
-        /* --- COMPONENTI GRAFICI --- */
+        /* --- GRAPHIC COMPONENTS --- */
         .drone-view {
             position: relative; width: 100%; height: 250px;
             background: rgba(0,255,255,0.02); border: 1px solid var(--border);
@@ -66,23 +66,11 @@
         }
         .tag-core { border-color: var(--accent); color: var(--accent); top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--accent-glow); }
 
-        /* Griglia adattiva per i dati */
-        .grid-stats { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
-            gap: 10px; 
-        }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
         .stat-card { 
-            background: var(--card); 
-            padding: 12px; 
-            border: 1px solid var(--border); 
-            text-align: center; 
-            position: relative; 
-            overflow: hidden; 
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: var(--card); padding: 12px; border: 1px solid var(--border); 
+            text-align: center; position: relative; overflow: hidden; min-height: 80px;
+            display: flex; flex-direction: column; justify-content: center;
         }
         .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--border); }
         .stat-card.active-param::before { background: var(--accent); }
@@ -90,7 +78,7 @@
         .stat-label { font-size: 0.55em; text-transform: uppercase; color: #7f8c8d; display: block; margin-bottom: 4px; line-height: 1.2; }
         .stat-value { display: block; font-size: 1.1em; color: var(--accent); font-weight: bold; }
 
-        /* --- BOTTONI SETTINGS --- */
+        /* --- SETTINGS BUTTONS --- */
         .btn-action {
             width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border);
             background: rgba(255,255,255,0.05); color: var(--text); font-family: inherit;
@@ -130,65 +118,64 @@
 
     <aside>
         <div class="nav-item active" onclick="showPage('dashboard', this)">Dash</div>
-        <div class="nav-item" onclick="showPage('mappa', this)">Mappa</div>
-        <div class="nav-item" onclick="showPage('log', this)">Log</div>
-        <div class="nav-item" onclick="showPage('analisi', this)">Dati</div>
-        <div class="nav-item" onclick="showPage('impostazioni', this)">Set.</div>
+        <div class="nav-item" onclick="showPage('map', this)">Map</div>
+        <div class="nav-item" onclick="showPage('logs', this)">Logs</div>
+        <div class="nav-item" onclick="showPage('data', this)">Data</div>
+        <div class="nav-item" onclick="showPage('settings', this)">Set.</div>
     </aside>
 
     <main>
         <header>
-            <div>ID: <span style="color:var(--accent)">AQUILA_001</span></div>
+            <div>SYSTEM: <span style="color:var(--accent)">AQUILA_001</span></div>
             <div id="clock">--:--:-- UTC</div>
         </header>
 
         <div class="content-area">
             <div id="dashboard" class="page active">
                 <div class="drone-view">
-                    <div class="health-tag" style="top:10%; left:10%">ALA DX: 12%</div>
-                    <div class="health-tag" style="top:10%; right:10%">ALA SX: 08%</div>
+                    <div class="health-tag" style="top:10%; left:10%">R-WING: 12%</div>
+                    <div class="health-tag" style="top:10%; right:10%">L-WING: 08%</div>
                     <div class="health-tag tag-core">CORE: 10%</div>
                 </div>
                 <div class="grid-stats">
                     <div class="stat-card active-param">
-                        <span class="stat-label">Stato Batteria</span>
+                        <span class="stat-label">Battery Status</span>
                         <span class="stat-value">05%</span>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-label">Salute Motore</span>
-                        <span class="stat-value" style="color:var(--red)">PESSIMO</span>
+                        <span class="stat-label">Engine Health</span>
+                        <span class="stat-value" style="color:var(--red)">CRITICAL</span>
                     </div>
                 </div>
             </div>
 
-            <div id="mappa" class="page">
+            <div id="map" class="page">
                 <div style="width:100%; height:250px; border:1px solid var(--border); background:#000; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
                     <img src="mappa_drone.png" alt="" style="width:100%; height:100%; object-fit:cover; opacity:0.4;">
                     <span style="position:absolute; color:var(--accent); font-size:0.6em; letter-spacing:2px;">[ GPS_OVR_ACTIVE ]</span>
                 </div>
             </div>
 
-            <div id="log" class="page">
+            <div id="logs" class="page">
                 <div style="overflow-x:auto">
                     <table style="width:100%; border-collapse:collapse; font-size:0.7em; min-width:400px;">
-                        <thead><tr style="color:var(--accent); border-bottom:1px solid var(--border)"><th style="padding:10px; text-align:left">TIME</th><th style="padding:10px; text-align:left">EVENTO</th><th style="padding:10px; text-align:left">STATUS</th></tr></thead>
+                        <thead><tr style="color:var(--accent); border-bottom:1px solid var(--border)"><th style="padding:10px; text-align:left">TIME</th><th style="padding:10px; text-align:left">EVENT</th><th style="padding:10px; text-align:left">STATUS</th></tr></thead>
                         <tbody id="logBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="analisi" class="page">
-                <h3 style="font-size:0.8em; margin-bottom:15px; color:var(--accent)">DIAGNOSTICA AVANZATA</h3>
+            <div id="data" class="page">
+                <h3 style="font-size:0.8em; margin-bottom:15px; color:var(--accent)">ADVANCED DIAGNOSTICS</h3>
                 <div class="grid-stats">
                     <div class="stat-card">
-                        <span class="stat-label">Altitudine MAX</span>
-                        <span class="stat-value">4.250m</span>
+                        <span class="stat-label">MAX Altitude</span>
+                        <span class="stat-value">4,250m</span>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-label">Velocità MAX</span>
+                        <span class="stat-label">MAX Speed</span>
                         <span class="stat-value">210km/h</span>
                     </div>
-                    
                     <div class="stat-card">
                         <span class="stat-label">Current Absorption</span>
                         <span class="stat-value">42.5A</span>
@@ -201,9 +188,8 @@
                         <span class="stat-label">Weather Cond.</span>
                         <span class="stat-value" style="font-size: 0.8em; color: var(--amber);">STORMING</span>
                     </div>
-
                     <div class="stat-card">
-                        <span class="stat-label">Temp Nucleo</span>
+                        <span class="stat-label">Core Temp</span>
                         <span class="stat-value">88°C</span>
                     </div>
                     <div class="stat-card">
@@ -213,11 +199,11 @@
                 </div>
             </div>
 
-            <div id="impostazioni" class="page">
-                <h3 style="font-size:0.8em; margin-bottom:15px;">MANUTENZIONE SISTEMA</h3>
+            <div id="settings" class="page">
+                <h3 style="font-size:0.8em; margin-bottom:15px;">SYSTEM MAINTENANCE</h3>
                 
                 <button class="btn-action" onclick="toggleTheme()">
-                    Cambia Tema (Dark/Light) <span>◐</span>
+                    Change Interface Theme <span>◐</span>
                 </button>
 
                 <button class="btn-action btn-warning">
@@ -229,7 +215,7 @@
                 </button>
                 
                 <div style="margin-top:20px; padding:10px; border:1px dashed var(--border); font-size:0.55em; color:#555;">
-                    ATTENZIONE: Il reset della comunicazione richiede il ricollegamento manuale del GCS (Ground Control Station).
+                    WARNING: System reboot requires manual GCS (Ground Control Station) reconnection.
                 </div>
             </div>
         </div>
@@ -252,12 +238,12 @@
                 document.getElementById('logBody').innerHTML = data.map(e => `
                     <tr style="border-bottom:1px solid var(--border)">
                         <td style="padding:10px">${e.timestamp}</td>
-                        <td style="padding:10px">${e.tipo}</td>
-                        <td style="padding:10px; color:var(--red)">${e.stato}</td>
+                        <td style="padding:10px">${e.type}</td>
+                        <td style="padding:10px; color:${e.status === 'OK' ? 'var(--green)' : 'var(--red)'}">${e.status}</td>
                     </tr>
                 `).join('');
             } catch (e) { 
-                document.getElementById('logBody').innerHTML = '<tr><td colspan="3" style="padding:20px; text-align:center; color:#555">Dati log non disponibili</td></tr>';
+                document.getElementById('logBody').innerHTML = '<tr><td colspan="3" style="padding:20px; text-align:center; color:#555">Log data unavailable</td></tr>';
             }
         }
 
