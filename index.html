@@ -66,13 +66,29 @@
         }
         .tag-core { border-color: var(--accent); color: var(--accent); top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--accent-glow); }
 
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-        .stat-card { background: var(--card); padding: 15px; border: 1px solid var(--border); text-align: center; position: relative; overflow: hidden; }
+        /* Griglia adattiva per i dati */
+        .grid-stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+            gap: 10px; 
+        }
+        .stat-card { 
+            background: var(--card); 
+            padding: 12px; 
+            border: 1px solid var(--border); 
+            text-align: center; 
+            position: relative; 
+            overflow: hidden; 
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
         .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--border); }
         .stat-card.active-param::before { background: var(--accent); }
         
-        .stat-label { font-size: 0.6em; text-transform: uppercase; color: #7f8c8d; display: block; margin-bottom: 5px; }
-        .stat-value { display: block; font-size: 1.2em; color: var(--accent); font-weight: bold; }
+        .stat-label { font-size: 0.55em; text-transform: uppercase; color: #7f8c8d; display: block; margin-bottom: 4px; line-height: 1.2; }
+        .stat-value { display: block; font-size: 1.1em; color: var(--accent); font-weight: bold; }
 
         /* --- BOTTONI SETTINGS --- */
         .btn-action {
@@ -92,10 +108,11 @@
                 width: 100%; height: var(--nav-size); flex-direction: row;
                 position: fixed; bottom: 0; border-right: none; border-top: 1px solid var(--border);
             }
-            .nav-item { flex: 1; padding: 0; display: flex; align-items: center; justify-content: center; border-left: none; border-top: 3px solid transparent; }
+            .nav-item { flex: 1; padding: 0; display: flex; align-items: center; justify-content: center; border-left: none; border-top: 3px solid transparent; font-size: 0.6em; }
             .nav-item.active { border-top-color: var(--accent); }
             main { height: calc(100vh - var(--nav-size)); }
             .content-area { padding-bottom: 30px; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-height: 450px) and (orientation: landscape) {
@@ -104,6 +121,8 @@
             header { height: 35px; font-size: 0.65em; }
             .drone-view { height: 160px; }
             .grid-stats { grid-template-columns: repeat(4, 1fr); }
+            .stat-card { padding: 8px; min-height: 60px; }
+            .stat-value { font-size: 0.9em; }
         }
     </style>
 </head>
@@ -119,7 +138,7 @@
 
     <main>
         <header>
-            <div>SISTEMA: <span style="color:var(--accent)">AQUILA_001</span></div>
+            <div>ID: <span style="color:var(--accent)">AQUILA_001</span></div>
             <div id="clock">--:--:-- UTC</div>
         </header>
 
@@ -145,7 +164,7 @@
             <div id="mappa" class="page">
                 <div style="width:100%; height:250px; border:1px solid var(--border); background:#000; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
                     <img src="mappa_drone.png" alt="" style="width:100%; height:100%; object-fit:cover; opacity:0.4;">
-                    <span style="position:absolute; color:var(--accent); font-size:0.6em; letter-spacing:2px;">[ NO SIGNAL ]</span>
+                    <span style="position:absolute; color:var(--accent); font-size:0.6em; letter-spacing:2px;">[ GPS_OVR_ACTIVE ]</span>
                 </div>
             </div>
 
@@ -159,7 +178,7 @@
             </div>
 
             <div id="analisi" class="page">
-                <h3 style="font-size:0.8em; margin-bottom:15px; color:var(--accent)">TELEMETRIA DI PICCO</h3>
+                <h3 style="font-size:0.8em; margin-bottom:15px; color:var(--accent)">DIAGNOSTICA AVANZATA</h3>
                 <div class="grid-stats">
                     <div class="stat-card">
                         <span class="stat-label">Altitudine MAX</span>
@@ -169,6 +188,20 @@
                         <span class="stat-label">Velocità MAX</span>
                         <span class="stat-value">210km/h</span>
                     </div>
+                    
+                    <div class="stat-card">
+                        <span class="stat-label">Current Absorption</span>
+                        <span class="stat-value">42.5A</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">GPS Satellites</span>
+                        <span class="stat-value">09</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Weather Cond.</span>
+                        <span class="stat-value" style="font-size: 0.8em; color: var(--amber);">STORMING</span>
+                    </div>
+
                     <div class="stat-card">
                         <span class="stat-label">Temp Nucleo</span>
                         <span class="stat-value">88°C</span>
@@ -196,7 +229,7 @@
                 </button>
                 
                 <div style="margin-top:20px; padding:10px; border:1px dashed var(--border); font-size:0.55em; color:#555;">
-                    ATTENZIONE: Le operazioni di reboot interromperanno il downlink dei dati per 45 secondi.
+                    ATTENZIONE: Il reset della comunicazione richiede il ricollegamento manuale del GCS (Ground Control Station).
                 </div>
             </div>
         </div>
