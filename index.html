@@ -3,397 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High-Tech Drone Maneuver Log</title>
+    <title>AQUILA OA-001 | Command Interface</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #03060a; /* Nero molto profondo con sfumature blu */
-            --bg-card: #08101a; /* Tonalità carta leggermente più chiara */
-            --text-main: #a9b9c9; /* Grigio freddo */
-            --accent: #00ffff; /* Ciano Neon per l'accento principale */
-            --accent-glow: rgba(0, 255, 255, 0.6);
-            --green: #00ff88; /* Verde Acido Neon */
-            --green-glow: rgba(0, 255, 136, 0.5);
-            --red: #ff3333; /* Rosso Elettrico Neon */
-            --red-glow: rgba(255, 51, 51, 0.6);
-            --border: #1a2a3a; /* Blu scuro sottile */
-            --font-main: 'Roboto Mono', monospace;
+            --bg: #03060a; --card: #08101a; --text: #a9b9c9; --accent: #00ffff;
+            --accent-glow: rgba(0, 255, 255, 0.4); --red: #ff3333; --green: #00ff88;
+            --border: #1a2a3a;
         }
 
-        * { box-sizing: border-box; }
+        /* Tema Chiaro */
+        body.light-theme {
+            --bg: #e0e4e8; --card: #ffffff; --text: #2c3e50; --accent: #0077be;
+            --accent-glow: rgba(0, 119, 190, 0.2); --border: #bdc3c7;
+        }
 
+        * { box-sizing: border-box; transition: background 0.3s, color 0.3s; }
         body {
-            font-family: var(--font-main);
-            background-color: var(--bg-dark);
-            background-image: 
-                linear-gradient(rgba(26, 42, 58, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(26, 42, 58, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px; /* Pattern a griglia esagonale a bassa opacità */
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            font-size: 0.9em;
+            font-family: 'Roboto Mono', monospace; background: var(--bg); color: var(--text);
+            margin: 0; display: flex; height: 100vh; overflow: hidden;
         }
 
-        /* --- Sidebar --- */
+        /* Sidebar */
         aside {
-            width: 220px;
-            background-color: var(--bg-card);
-            border-right: 2px solid var(--border);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            width: 240px; background: var(--card); border-right: 2px solid var(--border);
+            display: flex; flex-direction: column; z-index: 100;
+        }
+        .nav-item {
+            padding: 20px; cursor: pointer; border-left: 4px solid transparent;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.8em;
+        }
+        .nav-item:hover { background: rgba(0,255,255,0.05); }
+        .nav-item.active { border-left-color: var(--accent); color: var(--accent); background: rgba(0,255,255,0.05); }
+
+        /* Main Content */
+        main { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        header { 
+            padding: 15px 30px; background: var(--card); border-bottom: 2px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .logo-section {
-            padding: 0 20px 20px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
+        .page { display: none; padding: 30px; height: 100%; overflow-y: auto; }
+        .page.active { display: block; }
+
+        /* Dashboard & Drone Health */
+        .drone-container {
+            position: relative; width: 800px; margin: 0 auto;
+            background: url('https://i.imgur.com/your-drone-placeholder.png') no-repeat center; /* Qui andrebbe l'immagine del drone */
+            background-size: contain; height: 500px; border: 1px dashed var(--border);
+        }
+        .health-tag {
+            position: absolute; padding: 5px 10px; border: 1px solid var(--red);
+            background: rgba(255, 51, 51, 0.1); font-size: 0.7em; border-radius: 3px;
+        }
+        .health-tag.critical { color: var(--red); box-shadow: 0 0 10px var(--red); }
+        .health-tag.core { 
+            border-color: var(--accent); color: var(--accent); 
+            box-shadow: 0 0 15px var(--accent); top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
 
-        .logo-placeholder {
-            width: 50px; height: 50px;
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px var(--accent-glow);
-            margin-bottom: 10px;
-            position: relative;
-        }
-        .logo-placeholder::after {
-            content: ''; position: absolute; top: 15px; left: 15px; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 5px var(--accent-glow);
-        }
+        /* Analisi Dati */
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-card { background: var(--card); padding: 20px; border: 1px solid var(--border); text-align: center; }
+        .stat-value { display: block; font-size: 1.5em; color: var(--accent); margin-top: 10px; }
 
-        nav ul { list-style: none; padding: 0; margin: 0; }
+        /* Table Style */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); color: var(--accent); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
 
-        nav li {
-            padding: 15px 25px;
-            cursor: pointer;
-            border-left: 4px solid transparent;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            color: #7f8c8d;
-        }
+        /* Mappa Missione */
+        .map-frame { width: 100%; height: 600px; border: 2px solid var(--border); background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .map-frame img { max-width: 100%; max-height: 100%; }
 
-        nav li:hover {
-            color: var(--text-main);
-            background: rgba(26, 42, 58, 0.2);
-        }
-
-        nav li.active {
-            background: rgba(0, 255, 255, 0.05);
-            border-left: 4px solid var(--accent);
-            color: var(--accent);
-            text-shadow: 0 0 8px var(--accent-glow);
-            font-weight: bold;
-        }
-
-        /* --- Main Content --- */
-        main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* Effetto scanner orizzontale molto sottile */
-        main::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
-            animation: scanline 6s linear infinite;
-            opacity: 0.2;
-            z-index: 10;
-        }
-
-        @keyframes scanline {
-            0% { top: 0; } 100% { top: 100%; }
-        }
-
-        header {
-            padding: 15px 30px;
-            background: var(--bg-card);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--border);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        header .system-id {
-            color: var(--accent);
-            text-shadow: 0 0 5px var(--accent-glow);
-            font-weight: bold;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 25px;
-            padding: 25px;
-            overflow-y: auto;
-        }
-
-        /* --- Log Table --- */
-        .log-section {
-            background: var(--bg-card);
-            border-radius: 2px;
-            border: 1px solid var(--border);
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            position: relative;
-        }
-        
-        /* Dettaglio angolare decorativo */
-        .log-section::before {
-            content: ''; position: absolute; top: -1px; left: -1px; width: 20px; height: 20px;
-            border-top: 3px solid var(--accent); border-left: 3px solid var(--accent);
-            box-shadow: -2px -2px 5px var(--accent-glow);
-        }
-
-        .log-section h3 {
-            margin-top: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-            color: #fff;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 0.85em;
-        }
-
-        th {
-            text-align: left;
-            background: rgba(26, 42, 58, 0.4);
-            padding: 15px;
-            color: var(--accent);
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--border);
-        }
-
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        tr:hover td {
-            background: rgba(0, 255, 255, 0.03);
-            color: #fff;
-        }
-
-        .status-ok { 
-            color: var(--green); 
-            font-weight: bold; 
-            text-shadow: 0 0 5px var(--green-glow);
-        }
-        
-        .status-error { 
-            background: rgba(255, 51, 51, 0.15);
-            color: var(--red);
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 2px;
-            border: 1px solid var(--red);
-            text-shadow: 0 0 8px var(--red-glow);
-            box-shadow: 0 0 5px var(--red-glow);
-        }
-
-        /* --- Sidebar Widgets --- */
-        .widget {
-            background: var(--bg-card);
-            padding: 20px;
-            border-radius: 2px;
-            border: 1px solid var(--border);
-            margin-bottom: 25px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.4);
-        }
-
-        .widget h4 {
-            margin-top: 0; margin-bottom: 15px;
-            text-transform: uppercase;
-            color: var(--accent);
-            text-shadow: 0 0 5px var(--accent-glow);
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 8px;
-        }
-
-        .map-placeholder {
-            width: 100%; height: 220px;
-            background: #010204;
-            border: 2px solid var(--border);
-            position: relative;
-            display: flex; align-items: center; justify-content: center;
-        }
-        
-        /* Griglia radar decorativa */
-        .map-placeholder::after {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background-image: 
-                repeating-radial-gradient(circle at center, transparent, transparent 30px, rgba(0, 255, 255, 0.05) 31px),
-                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 20px 20px, 20px 20px;
-        }
-
-        .radar-center {
-            width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        /* Telemetria stilizzata */
-        .telemetry-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.9em;
-            align-items: center;
-        }
-        
-        .tel-label { color: #7f8c8d; text-transform: uppercase; }
-        .tel-value { color: #fff; font-weight: bold; }
-
-        .battery-bar-container {
-            width: 100%; height: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
-            margin-top: 5px;
-        }
-        .battery-bar-fill {
-            height: 100%; background: var(--green); width: 88%;
-            box-shadow: 0 0 10px var(--green-glow);
-        }
+        /* Settings */
+        .settings-group { max-width: 500px; }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border); }
+        button { background: var(--accent); border: none; padding: 10px 20px; cursor: pointer; font-family: inherit; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <aside>
-        <div class="logo-section">
-            <div class="logo-placeholder"></div>
-            <div style="font-size:0.7em; color:var(--accent)">UNIT OA-001</div>
+        <div style="padding: 30px; text-align: center; border-bottom: 1px solid var(--border);">
+            <div style="color: var(--accent); font-weight: bold; font-size: 1.2em;">AQUILA OA-001</div>
         </div>
         <nav>
-            <ul>
-                <li>Dashboard</li>
-                <li class="active">Log Manovre</li>
-                <li>Mappa Tattica</li>
-                <li>Info Drone</li>
-                <li>Impostazioni</li>
-            </ul>
+            <div class="nav-item active" onclick="showPage('dashboard')">Dashboard</div>
+            <div class="nav-item" onclick="showPage('mappa')">Mappa Missione</div>
+            <div class="nav-item" onclick="showPage('log')">Log Manovre</div>
+            <div class="nav-item" onclick="showPage('analisi')">Analisi Dati</div>
+            <div class="nav-item" onclick="showPage('impostazioni')">Impostazioni</div>
         </nav>
-        <div style="margin-top:auto; padding: 20px; font-size: 0.7em; color: #444;">
-            SYS VER: 4.1.2 // SECURED
-        </div>
     </aside>
 
     <main>
         <header>
-            <div><span class="system-id">></span> SISTEMA LOG MANOVRE UNITÀ AQUILA</div>
-            <div style="font-size:0.8em">
-                OPERATORE: <span style="color:#fff">LUCA ROSSI (LR-771)</span> //
-                <span id="clock" style="color:var(--accent)">10:35:12 UTC</span>
-            </div>
+            <div id="status-indicator">STATUS: <span style="color: var(--red);">DANNEGGIATO</span></div>
+            <div id="clock">00:00:00 UTC</div>
         </header>
 
-        <div class="content-grid">
-            <section class="log-section">
-                <h3>REGISTRO AVANZATO MANOVRE - OA-001</h3>
-                <table id="logTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>TIMESTAMP</th>
-                            <th>TIPO MANOVRA</th>
-                            <th>COORDINATE (Lat/Lon)</th>
-                            <th>ALT (m)</th>
-                            <th>STATO</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logBody">
-                        </tbody>
-                </table>
-            </section>
+        <div id="dashboard" class="page active">
+            <h2>DIAGNOSTICA SALUTE SISTEMA</h2>
+            <div class="drone-container">
+                <div class="health-tag critical" style="top: 20%; left: 15%;">ALA DX: CRITICO (12%)</div>
+                <div class="health-tag critical" style="top: 20%; right: 15%;">ALA SX: CRITICO (8%)</div>
+                <div class="health-tag critical" style="bottom: 25%; left: 40%;">MOTORE: PESSIMO (15%)</div>
+                <div class="health-tag core">NUCLEO CENTRALE: OPERATIVO (10%)</div>
+                <div class="health-tag critical" style="top: 5%; left: 50%;">SENSORI: GUASTO (4%)</div>
+            </div>
+        </div>
 
-            <section class="widgets">
-                <div class="widget">
-                    <h4>VISUALIZZAZIONE TATTICA</h4>
-                    <div class="map-placeholder">
-                        <div class="radar-center"></div>
-                    </div>
+        <div id="mappa" class="page">
+            <h2>MAPPA MISSIONE IN TEMPO REALE</h2>
+            <div class="map-frame">
+                <img src="mappa_drone.png" alt="Caricare mappa_drone.png nel repository" onerror="this.src='https://via.placeholder.com/800x600/000000/00ffff?text=Mappa+Drone+Mancante'">
+            </div>
+        </div>
+
+        <div id="log" class="page">
+            <h2>REGISTRO MANOVRE</h2>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>TIMESTAMP</th><th>TIPO</th><th>COORDINATE</th><th>STATO</th></tr>
+                </thead>
+                <tbody id="logBody"></tbody>
+            </table>
+        </div>
+
+        <div id="analisi" class="page">
+            <h2>ANALISI DIAGNOSTICA AVANZATA</h2>
+            <div class="grid-stats">
+                <div class="stat-card">TEMPERATURA NUCLEO <span class="stat-value">88°C</span></div>
+                <div class="stat-card">PRESSIONE IDRAULICA <span class="stat-value">12 PSI</span></div>
+                <div class="stat-card">CICLI MEMORIA <span class="stat-value">1.2B</span></div>
+                <div class="stat-card">INTEGRITÀ SEGNALE <span class="stat-value" style="color:var(--red)">14%</span></div>
+            </div>
+        </div>
+
+        <div id="impostazioni" class="page">
+            <h2>IMPOSTAZIONI INTERFACCIA</h2>
+            <div class="settings-group">
+                <div class="setting-row">
+                    <span>Tema Interfaccia</span>
+                    <button onclick="toggleTheme()">CAMBIA TEMA</button>
                 </div>
-                <div class="widget">
-                    <h4>TELEMETRIA DI SISTEMA</h4>
-                    <div class="telemetry-row">
-                        <span class="tel-label">Altitudine:</span> 
-                        <span class="tel-value">1500 M</span>
-                    </div>
-                    <div class="telemetry-row">
-                        <span class="tel-label">Velocità:</span> 
-                        <span class="tel-value">180 KM/H</span>
-                    </div>
-                    <div class="telemetry-row">
-                        <span class="tel-label">Batteria:</span> 
-                        <span class="status-ok">88%</span>
-                    </div>
-                    <div class="battery-bar-container">
-                        <div class="battery-bar-fill"></div>
-                    </div>
+                <div class="setting-row">
+                    <span>Crittografia Terminale</span>
+                    <span style="color: var(--green);">AES-256 ATTIVO</span>
                 </div>
-            </section>
+                <div class="setting-row">
+                    <span>Aggiornamento Automatico Log</span>
+                    <input type="checkbox" checked>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
-        // Funzione per caricare i dati dal file JSON
+        // Gestione Navigazione
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Caricamento Dati Log
         async function loadLogs() {
             try {
-                // Sostituisci con il percorso reale del tuo file JSON
                 const response = await fetch('log_drone.json');
-                if (!response.ok) throw new Error("Errore nel caricamento del file JSON");
                 const data = await response.json();
-                
-                const tableBody = document.getElementById('logBody');
-
-                data.forEach(entry => {
-                    const row = document.createElement('tr');
-                    
-                    // Applica stile speciale se c'è un'anomalia
-                    const statusClass = entry.stato === 'OK' ? 'status-ok' : 'status-error';
-
-                    row.innerHTML = `
+                const body = document.getElementById('logBody');
+                body.innerHTML = data.map(entry => `
+                    <tr>
                         <td>${entry.id}</td>
-                        <td style="color:#fff">${entry.timestamp}</td>
-                        <td style="text-transform:uppercase">${entry.tipo}</td>
+                        <td>${entry.timestamp}</td>
+                        <td>${entry.tipo}</td>
                         <td>${entry.coordinate}</td>
-                        <td>${entry.altitudine}</td>
-                        <td><span class="${statusClass}">${entry.stato}</span></td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } catch (error) {
-                console.error("Errore nel caricamento dei dati:", error);
-                document.getElementById('logBody').innerHTML = `<tr><td colspan="6" style="color:var(--red); text-align:center;">ERRORE CARICAMENTO DATI SISTEMA</td></tr>`;
-            }
+                        <td style="color:${entry.stato === 'OK' ? 'var(--green)' : 'var(--red)'}">${entry.stato}</td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error("Errore caricamento JSON"); }
         }
 
-        // Semplice orologio in alto a destra
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toISOString().substring(11, 19) + " UTC";
-            document.getElementById('clock').textContent = timeString;
+        // Cambio Tema
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
         }
 
-        // Avvia le funzioni al caricamento della pagina
-        window.onload = function() {
-            loadLogs();
-            updateClock();
-            setInterval(updateClock, 1000); // Aggiorna l'orologio ogni secondo
-        };
+        // Orologio
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toISOString().slice(11, 19) + " UTC";
+        }, 1000);
+
+        window.onload = loadLogs;
     </script>
 </body>
 </html>
