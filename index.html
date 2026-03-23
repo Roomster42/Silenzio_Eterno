@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AQUILA OA-001 | Pro-Mobile Interface</title>
+    <title>AQUILA OA-001 | Tactical Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #020406; --card: #0a121b; --text: #a9b9c9; --accent: #00ffff;
             --accent-glow: rgba(0, 255, 255, 0.4); --red: #ff3333; --green: #00ff88;
-            --border: #1a2a3a; --nav-size: 70px;
+            --amber: #ffbf00; --border: #1a2a3a; --nav-size: 70px;
         }
 
         body.light-theme {
@@ -22,10 +22,10 @@
         body {
             font-family: 'Roboto Mono', monospace; background: var(--bg); color: var(--text);
             margin: 0; display: flex; height: 100vh; width: 100vw; overflow: hidden;
-            flex-direction: row; /* Default Desktop/Landscape */
+            flex-direction: row;
         }
 
-        /* --- NAVIGAZIONE (SIDEBAR) --- */
+        /* --- NAVIGAZIONE --- */
         aside {
             width: 200px; background: var(--card); border-right: 1px solid var(--border);
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 100;
@@ -49,60 +49,62 @@
         }
 
         .content-area { flex-grow: 1; overflow-y: auto; padding: 15px; }
-
         .page { display: none; width: 100%; }
         .page.active { display: block; }
 
-        /* --- DASHBOARD --- */
+        /* --- COMPONENTI GRAFICI --- */
         .drone-view {
             position: relative; width: 100%; height: 250px;
             background: rgba(0,255,255,0.02); border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center;
+            margin-bottom: 15px;
         }
 
         .health-tag {
             position: absolute; padding: 3px 6px; border: 1px solid var(--red);
             background: rgba(0,0,0,0.8); font-size: 0.55em; color: var(--red);
         }
-        .tag-core { border-color: var(--accent); color: var(--accent); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .tag-core { border-color: var(--accent); color: var(--accent); top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--accent-glow); }
 
-        /* --- GRID DATI --- */
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px; }
-        .stat-card { background: var(--card); padding: 12px; border: 1px solid var(--border); text-align: center; }
-        .stat-value { display: block; font-size: 1.1em; color: var(--accent); }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        .stat-card { background: var(--card); padding: 15px; border: 1px solid var(--border); text-align: center; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--border); }
+        .stat-card.active-param::before { background: var(--accent); }
+        
+        .stat-label { font-size: 0.6em; text-transform: uppercase; color: #7f8c8d; display: block; margin-bottom: 5px; }
+        .stat-value { display: block; font-size: 1.2em; color: var(--accent); font-weight: bold; }
 
-        /* --- FIX MOBILE VERTICALE (Smartphone Portrait) --- */
+        /* --- BOTTONI SETTINGS --- */
+        .btn-action {
+            width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05); color: var(--text); font-family: inherit;
+            text-transform: uppercase; cursor: pointer; font-size: 0.8em; text-align: left;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .btn-action:active { background: var(--border); }
+        .btn-danger { border-color: var(--red); color: var(--red); }
+        .btn-warning { border-color: var(--amber); color: var(--amber); }
+
+        /* --- RESPONSIVE FIXES --- */
         @media (max-width: 600px) and (orientation: portrait) {
             body { flex-direction: column; }
             aside {
                 width: 100%; height: var(--nav-size); flex-direction: row;
-                border-right: none; border-top: 1px solid var(--border);
-                position: fixed; bottom: 0; order: 2;
+                position: fixed; bottom: 0; border-right: none; border-top: 1px solid var(--border);
             }
-            .nav-item { 
-                flex: 1; padding: 0; display: flex; align-items: center; justify-content: center;
-                border-left: none; border-top: 3px solid transparent; font-size: 0.6em;
-            }
+            .nav-item { flex: 1; padding: 0; display: flex; align-items: center; justify-content: center; border-left: none; border-top: 3px solid transparent; }
             .nav-item.active { border-top-color: var(--accent); }
             main { height: calc(100vh - var(--nav-size)); }
-            .content-area { padding-bottom: 20px; }
+            .content-area { padding-bottom: 30px; }
         }
 
-        /* --- FIX MOBILE ORIZZONTALE (Smartphone Landscape) --- */
         @media (max-height: 450px) and (orientation: landscape) {
-            aside { width: 80px; } /* Sidebar stretta per salvare spazio */
+            aside { width: 80px; }
             .nav-item { padding: 15px 5px; font-size: 0.55em; text-align: center; }
-            header { height: 35px; font-size: 0.6em; }
-            .drone-view { height: 160px; } /* Drone più basso per vedere i dati sotto */
-            .grid-stats { grid-template-columns: repeat(4, 1fr); } /* Dati su una riga sola */
-            .stat-card { padding: 5px; }
-            .stat-value { font-size: 0.9em; }
+            header { height: 35px; font-size: 0.65em; }
+            .drone-view { height: 160px; }
+            .grid-stats { grid-template-columns: repeat(4, 1fr); }
         }
-
-        /* Tabelle */
-        .table-container { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 450px; font-size: 0.7em; }
-        td, th { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
     </style>
 </head>
 <body>
@@ -118,7 +120,7 @@
     <main>
         <header>
             <div>SISTEMA: <span style="color:var(--accent)">AQUILA_001</span></div>
-            <div id="clock">12:00:00 UTC</div>
+            <div id="clock">--:--:-- UTC</div>
         </header>
 
         <div class="content-area">
@@ -127,40 +129,75 @@
                     <div class="health-tag" style="top:10%; left:10%">ALA DX: 12%</div>
                     <div class="health-tag" style="top:10%; right:10%">ALA SX: 08%</div>
                     <div class="health-tag tag-core">CORE: 10%</div>
-                    <div style="font-size: 0.5em; color: var(--border);">[ DIAGNOSTICA ATTIVA ]</div>
                 </div>
                 <div class="grid-stats">
-                    <div class="stat-card">BATTERIA <span class="stat-value">05%</span></div>
-                    <div class="stat-card">ALTITUDINE <span class="stat-value">1240m</span></div>
-                    <div class="stat-card">VELOCITÀ <span class="stat-value">140km/h</span></div>
-                    <div class="stat-card">MOTORE <span class="stat-value" style="color:var(--red)">PESSIMO</span></div>
+                    <div class="stat-card active-param">
+                        <span class="stat-label">Stato Batteria</span>
+                        <span class="stat-value">05%</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Salute Motore</span>
+                        <span class="stat-value" style="color:var(--red)">PESSIMO</span>
+                    </div>
                 </div>
             </div>
 
             <div id="mappa" class="page">
-                <div style="width:100%; height:200px; border:1px solid var(--border); background:#000; display:flex; align-items:center; justify-content:center;">
-                    <span style="font-size:0.6em; color:var(--accent)">CARICAMENTO MAPPA_DRONE.PNG...</span>
+                <div style="width:100%; height:250px; border:1px solid var(--border); background:#000; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                    <img src="mappa_drone.png" alt="" style="width:100%; height:100%; object-fit:cover; opacity:0.4;">
+                    <span style="position:absolute; color:var(--accent); font-size:0.6em; letter-spacing:2px;">[ NO SIGNAL ]</span>
                 </div>
             </div>
 
             <div id="log" class="page">
-                <div class="table-container">
-                    <table id="logTable">
-                        <thead><tr><th>TIME</th><th>EVENTO</th><th>STATUS</th></tr></thead>
+                <div style="overflow-x:auto">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.7em; min-width:400px;">
+                        <thead><tr style="color:var(--accent); border-bottom:1px solid var(--border)"><th style="padding:10px; text-align:left">TIME</th><th style="padding:10px; text-align:left">EVENTO</th><th style="padding:10px; text-align:left">STATUS</th></tr></thead>
                         <tbody id="logBody"></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="analisi" class="page">
+                <h3 style="font-size:0.8em; margin-bottom:15px; color:var(--accent)">TELEMETRIA DI PICCO</h3>
                 <div class="grid-stats">
-                    <div class="stat-card">TEMP NUCLEO <span class="stat-value">88°C</span></div>
-                    <div class="stat-card">COMM LINK <span class="stat-value" style="color:var(--red)">12%</span></div>
+                    <div class="stat-card">
+                        <span class="stat-label">Altitudine MAX</span>
+                        <span class="stat-value">4.250m</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Velocità MAX</span>
+                        <span class="stat-value">210km/h</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Temp Nucleo</span>
+                        <span class="stat-value">88°C</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Comm Link</span>
+                        <span class="stat-value" style="color:var(--red)">12%</span>
+                    </div>
                 </div>
             </div>
 
             <div id="impostazioni" class="page">
-                <button onclick="toggleTheme()" style="width:100%; padding:15px; background:var(--accent); border:none; font-family:inherit; font-weight:bold;">SWITCH THEME</button>
+                <h3 style="font-size:0.8em; margin-bottom:15px;">MANUTENZIONE SISTEMA</h3>
+                
+                <button class="btn-action" onclick="toggleTheme()">
+                    Cambia Tema (Dark/Light) <span>◐</span>
+                </button>
+
+                <button class="btn-action btn-warning">
+                    Communication Reset <span>⟲</span>
+                </button>
+
+                <button class="btn-action btn-danger">
+                    Reboot System <span>⚠</span>
+                </button>
+                
+                <div style="margin-top:20px; padding:10px; border:1px dashed var(--border); font-size:0.55em; color:#555;">
+                    ATTENZIONE: Le operazioni di reboot interromperanno il downlink dei dati per 45 secondi.
+                </div>
             </div>
         </div>
     </main>
@@ -180,13 +217,22 @@
                 const response = await fetch('log_drone.json');
                 const data = await response.json();
                 document.getElementById('logBody').innerHTML = data.map(e => `
-                    <tr><td>${e.timestamp}</td><td>${e.tipo}</td><td style="color:var(--red)">${e.stato}</td></tr>
+                    <tr style="border-bottom:1px solid var(--border)">
+                        <td style="padding:10px">${e.timestamp}</td>
+                        <td style="padding:10px">${e.tipo}</td>
+                        <td style="padding:10px; color:var(--red)">${e.stato}</td>
+                    </tr>
                 `).join('');
-            } catch (e) { console.log("JSON non trovato"); }
+            } catch (e) { 
+                document.getElementById('logBody').innerHTML = '<tr><td colspan="3" style="padding:20px; text-align:center; color:#555">Dati log non disponibili</td></tr>';
+            }
         }
 
         setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString() + " UTC";
+            const now = new Date();
+            document.getElementById('clock').innerText = now.getUTCHours().toString().padStart(2, '0') + ":" + 
+                                                       now.getUTCMinutes().toString().padStart(2, '0') + ":" + 
+                                                       now.getUTCSeconds().toString().padStart(2, '0') + " UTC";
         }, 1000);
 
         window.onload = loadLogs;
