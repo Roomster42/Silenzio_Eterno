@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controllo Posizionamento UTM WGS84</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            font-size: 1.5em;
+        }
+        .info-box {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Verifica Coordinate UTM</h2>
+        
+        <div class="info-box">
+            <strong>Centro di riferimento (Prefissato):</strong><br>
+            Easting (X): <span id="ref-x"></span> m<br>
+            Northing (Y): <span id="ref-y"></span> m<br>
+            Raggio di tolleranza: <strong>30 metri</strong>
+        </div>
+
+        <div class="form-group">
+            <label for="inputX">Easting (X) del punto da verificare:</label>
+            <input type="number" id="inputX" step="any" placeholder="Es. 500000.00">
+        </div>
+
+        <div class="form-group">
+            <label for="inputY">Northing (Y) del punto da verificare:</label>
+            <input type="number" id="inputY" step="any" placeholder="Es. 4600000.00">
+        </div>
+
+        <button onclick="checkCoordinates()">Verifica Posizione</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURAZIONE INIZIALE ---
+        // Inserisci qui le coordinate UTM WGS84 del centro prefissato
+        const centerEasting = 500000.00;  // Modifica questo valore (X)
+        const centerNorthing = 4600000.00; // Modifica questo valore (Y)
+        const radius = 30.0;               // Raggio in metri
+
+        // Mostra le coordinate prefissate nell'interfaccia
+        document.getElementById('ref-x').innerText = centerEasting.toFixed(2);
+        document.getElementById('ref-y').innerText = centerNorthing.toFixed(2);
+
+        function checkCoordinates() {
+            // Ottieni i valori inseriti dall'utente
+            const inputX = parseFloat(document.getElementById('inputX').value);
+            const inputY = parseFloat(document.getElementById('inputY').value);
+            const resultDiv = document.getElementById('result');
+
+            // Controllo che i campi non siano vuoti
+            if (isNaN(inputX) || isNaN(inputY)) {
+                alert("Per favore, inserisci dei valori numerici validi per X e Y.");
+                return;
+            }
+
+            // Calcolo della distanza euclidea (Teorema di Pitagora)
+            const deltaX = inputX - centerEasting;
+            const deltaY = inputY - centerNorthing;
+            const distance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
+
+            // Mostra il risultato
+            resultDiv.style.display = 'block';
+            
+            if (distance <= radius) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `✅ Il punto è ALL'INTERNO del cerchio.<br>
+                <span style="font-weight:normal; font-size:0.9em;">Distanza dal centro: ${distance.toFixed(2)} metri.</span>`;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `❌ Il punto è ALL'ESTERNO del cerchio.<br>
+                <span style="font-weight:normal; font-size:0.9em;">Distanza dal centro: ${distance.toFixed(2)} metri.</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
