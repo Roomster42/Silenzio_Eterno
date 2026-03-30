@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UAV Combat Simulation Access</title>
+    <title>UAV Combat Control Interface</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        /* --- Variabili di Tema: High-Tech / Mil-Spec --- */
+        /* Variabili di Tema: High-Tech / Mil-Spec */
         :root {
             --bg-base: #0a0e17;
             --bg-panel: #111827;
@@ -48,106 +48,366 @@
             color: var(--text-primary);
             overflow: hidden;
             transition: background-color 0.3s, color 0.3s;
+        }
+
+        .app-container {
+            display: flex;
             height: 100vh;
             width: 100vw;
+        }
+
+        /* Navigazione */
+        nav {
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
-            align-items: center;
-            justify-content: center;
+            z-index: 1000;
         }
 
-        /* --- STILI PAGINA DI ACCESSO --- */
-        #loginPage {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('data:image/png;base64, ... [DATI BASE64 IMMAGINE DRONE QUI] ... '); /* Inserire qui l'immagine in Base64 */
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        /* SOSTITUISCI IL SEGUENTE SELETTORE CON L'IMMAGINE BASE64 SE DISPONIBILE */
-        #loginPage::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Sovrapposizione scura per leggibilità */
-            z-index: -1;
-        }
-
-        .login-container {
-            background-color: rgba(17, 24, 39, 0.9);
-            border: 2px solid var(--border-color);
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.3);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .login-container h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-primary);
-        }
-
-        .code-input-group {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .code-input {
-            width: 80px;
-            height: 50px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
             font-family: var(--font-main);
-            font-size: 1.5rem;
-            text-align: center;
-            text-transform: uppercase;
-            border-radius: 4px;
-        }
-
-        .code-input:focus {
-            outline: none;
-            border-color: var(--text-primary);
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
-        }
-
-        .login-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: var(--bg-base);
-            border: 2px solid var(--border-color);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 15px 20px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: 0.2s;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        nav button:hover {
+            color: var(--text-primary);
+            background-color: rgba(0, 255, 204, 0.1);
+        }
+
+        nav button.active {
+            color: var(--text-primary);
+            border-left-color: var(--text-primary);
+            background-color: rgba(0, 255, 204, 0.15);
+            text-shadow: 0 0 8px var(--text-primary);
+        }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Media Queries per Orientamento Schermo --- */
+        /* Verticale (Portrait) */
+        @media (orientation: portrait) {
+            .app-container { flex-direction: column; }
+            nav {
+                flex-direction: row;
+                overflow-x: auto;
+                white-space: nowrap;
+                border-right: none;
+            }
+            nav button { border-left: none; border-bottom: 3px solid transparent; }
+            nav button.active { border-left: none; border-bottom-color: var(--text-primary); }
+        }
+
+        /* Orizzontale (Landscape) */
+        @media (orientation: landscape) {
+            .app-container { flex-direction: row; }
+            nav {
+                flex-direction: column;
+                width: 200px;
+                min-width: 200px;
+                border-bottom: none;
+            }
+        }
+
+        /* Elementi UI comuni */
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
             border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
 
-        .login-btn:hover {
-            background: rgba(0, 255, 204, 0.2);
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
-        }
+        h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
 
-        .login-btn:disabled {
-            border-color: #555;
-            color: #555;
-            cursor: not-allowed;
+        .status-abbattuto { color: var(--alert-red); }
+        .status-nonop { color: var(--warn-yellow); }
+        .status-launched { color: var(--ok-green); text-shadow: 0 0 5px var(--ok-green); }
+
+        /* Dashboard Grid */
+        .grid-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .item-card { border: 1px solid var(--border-color); padding: 15px; background: rgba(0,0,0,0.2); }
+
+        /* Swarm Bars */
+        .progress-container { width: 100%; background: #333; height: 20px; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .progress-bar { height: 100%; background-color: var(--ok-green); }
+        .bar-red { background-color: var(--alert-red); }
+        .bar-yellow { background-color: var(--warn-yellow); }
+
+        /* Table Log */
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
+        th { background-color: rgba(0, 255, 204, 0.1); color: var(--text-primary); }
+
+        /* Map */
+        #map { height: 60vh; width: 100%; border: 2px solid var(--border-color); border-radius: 4px; }
+
+        /* Settings Buttons */
+        .btn {
+            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            background: var(--bg-base); border: 1px solid var(--border-color);
+            color: var(--text-primary); font-family: var(--font-main); font-size: 1rem;
+            cursor: pointer; text-transform: uppercase; transition: 0.2s;
         }
+        .btn:hover { background: rgba(0, 255, 204, 0.2); }
+        .btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <nav id="mainMenu">
+        <button class="active" onclick="showTab('dashboard')">Dashboard</button>
+        <button onclick="showTab('swarm')">Swarm</button>
+        <button onclick="showTab('map', true)">Map</button>
+        <button onclick="showTab('log')">Log</button>
+        <button onclick="showTab('data')">Data</button>
+        <button onclick="showTab('settings')">Settings</button>
+    </nav>
+
+    <main>
+        <section id="dashboard" class="active">
+            <h2>System Dashboard</h2>
+            <div class="panel">
+                <h3>DRONI</h3><br>
+                <div class="grid-list">
+                    <div class="item-card">ID: MQ-9 Reaper (A)<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">ID: MQ-9 Reaper (B)<br>Status: <span class="status-abbattuto">Abbattuto</span></div>
+                    <div class="item-card">ID: RQ-4 Global Hawk<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">ID: Bayraktar TB2 (X)<br>Status: <span class="status-launched">Launched</span></div>
+                    <div class="item-card">ID: Switchblade 300<br>Status: <span class="status-abbattuto">Abbattuto</span></div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>LANCIATORI</h3><br>
+                <div class="grid-list">
+                    <div class="item-card">L-01 Alpha<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">L-02 Bravo<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">L-03 Charlie<br>Status: <span class="status-launched">Operativo</span></div>
+                    <div class="item-card">L-04 Delta<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="swarm">
+            <h2>Swarm Health Status</h2>
+            <div class="panel">
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>Bayraktar TB2 (X) - 100% (In Volo)</span>
+                    <div class="progress-container"><div class="progress-bar" style="width: 100%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>MQ-9 Reaper (A) - 45% (Manutenzione)</span>
+                    <div class="progress-container"><div class="progress-bar bar-yellow" style="width: 45%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>RQ-4 Global Hawk - 82% (Standby)</span>
+                    <div class="progress-container"><div class="progress-bar bar-yellow" style="width: 82%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>MQ-9 Reaper (B) - 0% (Distrutto)</span>
+                    <div class="progress-container"><div class="progress-bar bar-red" style="width: 0%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>Switchblade 300 - 0% (Detonato)</span>
+                    <div class="progress-container"><div class="progress-bar bar-red" style="width: 0%"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="map">
+            <h2>Tactical Map - Settore Cantù</h2>
+            <div class="panel">
+                <div id="mapContainer" style="height: 65vh; width: 100%; border: 1px solid var(--border-color);"></div>
+            </div>
+        </section>
+
+        <section id="log">
+            <h2>Flight & Event Logs</h2>
+            <div class="panel" style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Drone ID</th>
+                            <th>Time</th>
+                            <th>Event</th>
+                            <th>Event Position (WGS84 UTM)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody">
+                        </tbody>
+                </table>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-secondary);">
+                    *Lettura dati in corso...
+                </p>
+            </div>
+        </section>
+
+        <section id="data">
+            <h2>Telemetry & Sensors</h2>
+            <div class="panel">
+                <div class="grid-list">
+                    <div class="item-card"><strong>Max Altitudine:</strong><br>25.400 ft (7.741 m)</div>
+                    <div class="item-card"><strong>Max Speed:</strong><br>220 km/h (118 kts)</div>
+                    <div class="item-card"><strong>Current Absorption:</strong><br>45.2 A / 28V DC</div>
+                    <div class="item-card"><strong>GPS Satellite:</strong><br>14 Locked (3D Fix)</div>
+                    <div class="item-card"><strong>Weather Cond.:</strong><br>Vento 12 Kts NE - Visibilità CLR</div>
+                    <div class="item-card"><strong>Core Temperature:</strong><br>78.5 °C (Nominale)</div>
+                    <div class="item-card"><strong>Comm Link:</strong><br>AES-256 SATCOM - Signal 98%</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings">
+            <h2>System Settings</h2>
+            <div class="panel" style="max-width: 400px; margin: auto;">
+                <button class="btn" onclick="toggleTheme()">1. Toggle Theme (Light/Dark)</button>
+                <button class="btn" onclick="fakeAction('Reset Comunicazioni inizializzato...')">2. Reset Communications</button>
+                <button class="btn" onclick="fakeAction('Sincronizzazione Dati in corso...')">3. Data Sync</button>
+                <button class="btn" onclick="fakeAction('Riavvio Sistemi di Difesa...')">4. System Reboot</button>
+                <p id="settingsFeedback" style="text-align:center; margin-top:10px; color: var(--warn-yellow);"></p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    // --- GESTIONE TAB ---
+    let mapInitialized = false;
+    let map;
+
+    function showTab(tabId, isMap = false) {
+        // Nascondi tutte le sezioni
+        document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
+        // Deseleziona tutti i bottoni
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+        
+        // Attiva la sezione richiesta
+        document.getElementById(tabId).classList.add('active');
+        // Trova il bottone corretto e attivalo (basato su onclick string)
+        const btn = document.querySelector(`nav button[onclick*="${tabId}"]`);
+        if(btn) btn.classList.add('active');
+
+        // Se si apre la mappa, bisogna fare il resize per Leaflet
+        if(isMap && !mapInitialized) {
+            initMap();
+            mapInitialized = true;
+        } else if (isMap && mapInitialized) {
+            setTimeout(() => map.invalidateSize(), 100);
+        }
+    }
+
+    // --- GESTIONE MAPPA (Cantù) ---
+    function initMap() {
+        // Coordinate di Cantù
+        map = L.map('mapContainer').setView([45.7410, 9.1278], 13);
+        
+        // Mappa topografica
+        L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap'
+        }).addTo(map);
+
+        // Marker finti per la simulazione
+        L.circleMarker([45.745, 9.130], {color: 'red', radius: 8}).addTo(map).bindPopup("Target Alpha");
+        L.circleMarker([45.730, 9.120], {color: '#00ffcc', radius: 5}).addTo(map).bindPopup("Bayraktar TB2 - Position");
+        L.circleMarker([45.750, 9.140], {color: 'yellow', radius: 5}).addTo(map).bindPopup("Lanciatore L-03 (Operativo)");
+    }
+
+    // --- GESTIONE TEMA ---
+    function toggleTheme() {
+        const html = document.documentElement;
+        if (html.getAttribute('data-theme') === 'dark') {
+            html.setAttribute('data-theme', 'light');
+        } else {
+            html.setAttribute('data-theme', 'dark');
+        }
+    }
+
+    // --- FAKE BUTTONS SETTINGS ---
+    function fakeAction(msg) {
+        const feedback = document.getElementById('settingsFeedback');
+        feedback.innerText = msg;
+        setTimeout(() => { feedback.innerText = ""; }, 3000);
+    }
+
+    // --- CARICAMENTO LOG DA FILE ESTERNO ---
+    async function loadLogs() {
+        const tbody = document.getElementById('logTableBody');
+        
+        // Dati di Fallback se non esiste il file log_drone_json
+        const fallbackData = [
+            {"id": "Bayraktar TB2", "time": "08:14:22", "event": "Takeoff Clearance", "pos": "32T 509800E 5065300N", "status": "Launched"},
+            {"id": "Bayraktar TB2", "time": "08:18:00", "event": "WayPoint 1 Reached", "pos": "32T 510100E 5066000N", "status": "In Volo"},
+            {"id": "MQ-9 Reaper (B)", "time": "07:55:10", "event": "Missile Lock Detected", "pos": "32T 508000E 5064000N", "status": "Evasive maneuvers"},
+            {"id": "MQ-9 Reaper (B)", "time": "07:56:02", "event": "Telemetry Lost", "pos": "32T 508200E 5064100N", "status": "Abbattuto"}
+        ];
+
+        try {
+            // Tenta di caricare il file "log_drone_json"
+            const response = await fetch('log_drone_json');
+            if (!response.ok) throw new Error("File non trovato");
+            const data = await response.json();
+            renderTable(data, tbody);
+        } catch (error) {
+            console.log("File log_drone_json non rilevato. Caricamento dati di fallback.");
+            renderTable(fallbackData, tbody);
+        }
+    }
+
+    function renderTable(dataArray, container) {
+        container.innerHTML = "";
+        dataArray.forEach(row => {
+            let statusClass = "";
+            if(row.status.toLowerCase().includes("abbattuto")) statusClass = "status-abbattuto";
+            if(row.status.toLowerCase().includes("launched") || row.status.toLowerCase().includes("volo")) statusClass = "status-launched";
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.id}</td>
+                <td>${row.time}</td>
+                <td>${row.event}</td>
+                <td>${row.pos}</td>
+                <td class="${statusClass}">${row.status}</td>
+            `;
+            container.appendChild(tr);
+        });
+    }
+
+    // Inizializza la tabella log al caricamento
+    window.onload = loadLogs;
+</script>
+
+</body>
+</html>
