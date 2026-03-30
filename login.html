@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Combat - Access Terminal</title>
+
+    <style>
+        /* Variabili di Tema: High-Tech / Mil-Spec */
+        :root {
+            --bg-base: #0a0e17;
+            --text-primary: #00ffcc;
+            --border-color: #00ffcc40;
+            --alert-red: #ff3333;
+            --warn-yellow: #ffcc00;
+            --font-main: 'Courier New', Courier, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Sfondo con immagine del Drone */
+        #loginBackground {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Inserisci qui l'URL o il Base64 della tua immagine UAV */
+            background-image: url('https://images.unsplash.com/photo-1527977966376-1c8408f9f108?q=80&w=2000&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            filter: grayscale(100%) contrast(120%) brightness(40%); /* Effetto visore notturno/militare */
+        }
+
+        #loginBackground::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(10, 14, 23, 0.6), rgba(10, 14, 23, 0.9));
+        }
+
+        /* Contenitore Accesso */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            background-color: rgba(17, 24, 39, 0.85);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.15);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            backdrop-filter: blur(5px);
+        }
+
+        .login-container h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+        }
+
+        .login-container p.subtitle {
+            font-size: 0.9rem;
+            color: #00b38f;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .code-input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .code-input {
+            width: 90px;
+            height: 55px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: var(--text-primary);
+            box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.2), 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+
+        .code-input::placeholder {
+            color: rgba(0, 255, 204, 0.2);
+        }
+
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--text-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            background: rgba(0, 255, 204, 0.15);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+
+        .login-btn:disabled {
+            border-color: #555;
+            color: #555;
+            cursor: not-allowed;
+            background: rgba(0,0,0,0.5);
+        }
+
+        #loginErrorMessage {
+            color: var(--alert-red);
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 1.2em;
+            text-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
+        }
+
+        #loginCountdown {
+            color: var(--warn-yellow);
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="loginBackground"></div>
+
+    <div class="login-container">
+        <h1>UAV Control Link</h1>
+        <p class="subtitle">Secure Authentication Required</p>
+        
+        <div class="code-input-group">
+            <input type="text" class="code-input" id="codePart1" maxlength="4" placeholder="AAAA" autocomplete="off">
+            <span style="color: var(--text-primary); font-size: 1.5rem;">-</span>
+            <input type="text" class="code-input" id="codePart2" maxlength="4" placeholder="0000" autocomplete="off">
+        </div>
+        
+        <button class="login-btn" id="loginBtn">Authenticate</button>
+        <p id="loginErrorMessage"></p>
+        <p id="loginCountdown">SYSTEM LOCKED. Retry in <span id="countdownTimer">30</span>s.</p>
+    </div>
+
+    <script>
+        // --- CONFIGURAZIONE ACCESSO ---
+        const CORRECT_CODE_1 = "A1B2"; // Prima parte del codice
+        const CORRECT_CODE_2 = "C3D4"; // Seconda parte del codice
+        
+        let attempts = 0;
+        let lockTimer;
+
+        // Elementi DOM
+        const codePart1Input = document.getElementById('codePart1');
+        const codePart2Input = document.getElementById('codePart2');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('loginErrorMessage');
+        const countdownDisplay = document.getElementById('loginCountdown');
+        const timerSpan = document.getElementById('countdownTimer');
+
+        // Spostamento automatico dal primo al secondo input
+        codePart1Input.addEventListener('input', function() {
+            if (this.value.length === 4) {
+                codePart2Input.focus();
+            }
+        });
+
+        // Esecuzione al click del bottone
+        loginBtn.addEventListener('click', attemptLogin);
+
+        // Permetti l'invio premendo "Invio" sulla tastiera
+        codePart2Input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                attemptLogin();
+            }
+        });
+
+        function attemptLogin() {
+            if (loginBtn.disabled) return;
+
+            const code1 = codePart1Input.value.toUpperCase();
+            const code2 = codePart2Input.value.toUpperCase();
+
+            // Verifica
+            if (code1 === CORRECT_CODE_1 && code2 === CORRECT_CODE_2) {
+                errorMessage.style.color = 'var(--text-primary)';
+                errorMessage.innerText = "Accesso Concesso. Inizializzazione uplink...";
+                
+                // Redirezione alla dashboard dopo 1 secondo di attesa (effetto scenico)
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                // Errore
+                attempts++;
+                errorMessage.style.color = 'var(--alert-red)';
+                errorMessage.innerText = "ERRORE: Codice non valido.";
+                
+                // Reset campi
+                codePart1Input.value = "";
+                codePart2Input.value = "";
+                codePart1Input.focus();
+
+                // Blocco dopo 3 tentativi
+                if (attempts >= 3) {
+                    lockLoginPage();
+                }
+            }
+        }
+
+        // Funzione di blocco e conto alla rovescia
+        function lockLoginPage() {
+            loginBtn.disabled = true;
+            codePart1Input.disabled = true;
+            codePart2Input.disabled = true;
+            
+            errorMessage.innerText = "TROPPI TENTATIVI FALLITI.";
+            countdownDisplay.style.display = 'block';
+            
+            let timeLeft = 30;
+            timerSpan.innerText = timeLeft;
+
+            lockTimer = setInterval(function() {
+                timeLeft--;
+                timerSpan.innerText = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(lockTimer);
+                    
+                    // Sblocco sistema
+                    loginBtn.disabled = false;
+                    codePart1Input.disabled = false;
+                    codePart2Input.disabled = false;
+                    countdownDisplay.style.display = 'none';
+                    errorMessage.innerText = "";
+                    attempts = 0;
+                    codePart1Input.focus();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
