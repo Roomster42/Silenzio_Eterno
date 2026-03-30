@@ -1,260 +1,413 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AQUILA OA-001 | Tactical Command Interface</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>UAV Combat Control Interface</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
+        /* Variabili di Tema: High-Tech / Mil-Spec */
         :root {
-            --bg: #020406; --card: #0a121b; --text: #a9b9c9; --accent: #00ffff;
-            --accent-glow: rgba(0, 255, 255, 0.4); --red: #ff3333; --green: #00ff88;
-            --amber: #ffbf00; --border: #1a2a3a; --nav-size: 70px;
+            --bg-base: #0a0e17;
+            --bg-panel: #111827;
+            --text-primary: #00ffcc;
+            --text-secondary: #00b38f;
+            --text-light: #e5e7eb;
+            --border-color: #00ffcc40;
+            --alert-red: #ff3333;
+            --warn-yellow: #ffcc00;
+            --ok-green: #00ff66;
+            --font-main: 'Courier New', Courier, monospace;
         }
 
-        body.light-theme {
-            --bg: #e0e4e8; --card: #ffffff; --text: #2c3e50; --accent: #0077be;
-            --border: #bdc3c7;
+        [data-theme="light"] {
+            --bg-base: #e5e7eb;
+            --bg-panel: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-light: #1f2937;
+            --border-color: #9ca3af;
+            --alert-red: #dc2626;
+            --warn-yellow: #d97706;
+            --ok-green: #16a34a;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
         body {
-            font-family: 'Roboto Mono', monospace; background: var(--bg); color: var(--text);
-            margin: 0; display: flex; height: 100vh; width: 100vw; overflow: hidden;
-            flex-direction: row;
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* --- NAVIGATION --- */
-        aside {
-            width: 200px; background: var(--card); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; flex-shrink: 0; z-index: 100;
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
         }
 
-        .nav-item {
-            padding: 20px; cursor: pointer; border-left: 3px solid transparent;
-            text-transform: uppercase; letter-spacing: 1px; font-size: 0.75em;
-            transition: 0.2s;
+        /* Navigazione */
+        nav {
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            z-index: 1000;
         }
 
-        .nav-item.active { border-left-color: var(--accent); color: var(--accent); background: rgba(0,255,255,0.05); }
-
-        /* --- MAIN LAYOUT --- */
-        main { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
-        
-        header { 
-            height: 50px; padding: 0 20px; background: var(--card); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.7em;
-            flex-shrink: 0;
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 15px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
         }
 
-        .content-area { flex-grow: 1; overflow-y: auto; padding: 15px; }
-        .page { display: none; width: 100%; }
-        .page.active { display: block; }
-
-        /* --- GRAPHIC COMPONENTS --- */
-        .drone-view {
-            position: relative; width: 100%; height: 250px;
-            background: rgba(0,255,255,0.02); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 15px;
+        nav button:hover {
+            color: var(--text-primary);
+            background-color: rgba(0, 255, 204, 0.1);
         }
 
-        .health-tag {
-            position: absolute; padding: 3px 6px; border: 1px solid var(--red);
-            background: rgba(0,0,0,0.8); font-size: 0.55em; color: var(--red);
+        nav button.active {
+            color: var(--text-primary);
+            border-left-color: var(--text-primary);
+            background-color: rgba(0, 255, 204, 0.15);
+            text-shadow: 0 0 8px var(--text-primary);
         }
-        .tag-core { border-color: var(--accent); color: var(--accent); top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--accent-glow); }
 
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-        .stat-card { 
-            background: var(--card); padding: 12px; border: 1px solid var(--border); 
-            text-align: center; position: relative; overflow: hidden; min-height: 80px;
-            display: flex; flex-direction: column; justify-content: center;
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
         }
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--border); }
-        .stat-card.active-param::before { background: var(--accent); }
-        
-        .stat-label { font-size: 0.55em; text-transform: uppercase; color: #7f8c8d; display: block; margin-bottom: 4px; line-height: 1.2; }
-        .stat-value { display: block; font-size: 1.1em; color: var(--accent); font-weight: bold; }
 
-        /* --- SETTINGS BUTTONS --- */
-        .btn-action {
-            width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border);
-            background: rgba(255,255,255,0.05); color: var(--text); font-family: inherit;
-            text-transform: uppercase; cursor: pointer; font-size: 0.8em; text-align: left;
-            display: flex; justify-content: space-between; align-items: center;
+        section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
         }
-        .btn-action:active { background: var(--border); }
-        .btn-danger { border-color: var(--red); color: var(--red); }
-        .btn-warning { border-color: var(--amber); color: var(--amber); }
 
-        /* --- RESPONSIVE FIXES --- */
-        @media (max-width: 600px) and (orientation: portrait) {
-            body { flex-direction: column; }
-            aside {
-                width: 100%; height: var(--nav-size); flex-direction: row;
-                position: fixed; bottom: 0; border-right: none; border-top: 1px solid var(--border);
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Media Queries per Orientamento Schermo --- */
+        /* Verticale (Portrait) */
+        @media (orientation: portrait) {
+            .app-container { flex-direction: column; }
+            nav {
+                flex-direction: row;
+                overflow-x: auto;
+                white-space: nowrap;
+                border-right: none;
             }
-            .nav-item { flex: 1; padding: 0; display: flex; align-items: center; justify-content: center; border-left: none; border-top: 3px solid transparent; font-size: 0.6em; }
-            .nav-item.active { border-top-color: var(--accent); }
-            main { height: calc(100vh - var(--nav-size)); }
-            .content-area { padding-bottom: 30px; }
-            .grid-stats { grid-template-columns: repeat(2, 1fr); }
+            nav button { border-left: none; border-bottom: 3px solid transparent; }
+            nav button.active { border-left: none; border-bottom-color: var(--text-primary); }
         }
 
-        @media (max-height: 450px) and (orientation: landscape) {
-            aside { width: 80px; }
-            .nav-item { padding: 15px 5px; font-size: 0.55em; text-align: center; }
-            header { height: 35px; font-size: 0.65em; }
-            .drone-view { height: 160px; }
-            .grid-stats { grid-template-columns: repeat(4, 1fr); }
-            .stat-card { padding: 8px; min-height: 60px; }
-            .stat-value { font-size: 0.9em; }
+        /* Orizzontale (Landscape) */
+        @media (orientation: landscape) {
+            .app-container { flex-direction: row; }
+            nav {
+                flex-direction: column;
+                width: 200px;
+                min-width: 200px;
+                border-bottom: none;
+            }
         }
+
+        /* Elementi UI comuni */
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
+
+        .status-abbattuto { color: var(--alert-red); }
+        .status-nonop { color: var(--warn-yellow); }
+        .status-launched { color: var(--ok-green); text-shadow: 0 0 5px var(--ok-green); }
+
+        /* Dashboard Grid */
+        .grid-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .item-card { border: 1px solid var(--border-color); padding: 15px; background: rgba(0,0,0,0.2); }
+
+        /* Swarm Bars */
+        .progress-container { width: 100%; background: #333; height: 20px; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .progress-bar { height: 100%; background-color: var(--ok-green); }
+        .bar-red { background-color: var(--alert-red); }
+        .bar-yellow { background-color: var(--warn-yellow); }
+
+        /* Table Log */
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
+        th { background-color: rgba(0, 255, 204, 0.1); color: var(--text-primary); }
+
+        /* Map */
+        #map { height: 60vh; width: 100%; border: 2px solid var(--border-color); border-radius: 4px; }
+
+        /* Settings Buttons */
+        .btn {
+            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            background: var(--bg-base); border: 1px solid var(--border-color);
+            color: var(--text-primary); font-family: var(--font-main); font-size: 1rem;
+            cursor: pointer; text-transform: uppercase; transition: 0.2s;
+        }
+        .btn:hover { background: rgba(0, 255, 204, 0.2); }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
-    <aside>
-        <div class="nav-item active" onclick="showPage('dashboard', this)">Dash</div>
-        <div class="nav-item" onclick="showPage('map', this)">Map</div>
-        <div class="nav-item" onclick="showPage('logs', this)">Logs</div>
-        <div class="nav-item" onclick="showPage('data', this)">Data</div>
-        <div class="nav-item" onclick="showPage('settings', this)">Set.</div>
-    </aside>
+<div class="app-container">
+    <nav id="mainMenu">
+        <button class="active" onclick="showTab('dashboard')">Dashboard</button>
+        <button onclick="showTab('swarm')">Swarm</button>
+        <button onclick="showTab('map', true)">Map</button>
+        <button onclick="showTab('log')">Log</button>
+        <button onclick="showTab('data')">Data</button>
+        <button onclick="showTab('settings')">Settings</button>
+    </nav>
 
     <main>
-        <header>
-            <div>SYSTEM: <span style="color:var(--accent)">AQUILA_001</span></div>
-            <div id="clock">--:--:-- UTC</div>
-        </header>
-
-        <div class="content-area">
-            <div id="dashboard" class="page active">
-                <div class="drone-view">
-                    <div class="health-tag" style="top:10%; left:10%">R-WING: 12%</div>
-                    <div class="health-tag" style="top:10%; right:10%">L-WING: 08%</div>
-                    <div class="health-tag tag-core">CORE: 10%</div>
-                </div>
-                <div class="grid-stats">
-                    <div class="stat-card active-param">
-                        <span class="stat-label">Battery Status</span>
-                        <span class="stat-value">05%</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Engine Health</span>
-                        <span class="stat-value" style="color:var(--red)">CRITICAL</span>
-                    </div>
+        <section id="dashboard" class="active">
+            <h2>System Dashboard</h2>
+            <div class="panel">
+                <h3>DRONI</h3><br>
+                <div class="grid-list">
+                    <div class="item-card">ID: MQ-9 Reaper (A)<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">ID: MQ-9 Reaper (B)<br>Status: <span class="status-abbattuto">Abbattuto</span></div>
+                    <div class="item-card">ID: RQ-4 Global Hawk<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">ID: Bayraktar TB2 (X)<br>Status: <span class="status-launched">Launched</span></div>
+                    <div class="item-card">ID: Switchblade 300<br>Status: <span class="status-abbattuto">Abbattuto</span></div>
                 </div>
             </div>
-
-            <div id="map" class="page">
-                <div style="width:100%; height:250px; border:1px solid var(--border); background:#000; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
-                    <img src="mappa_drone.png" alt="" style="width:100%; height:100%; object-fit:cover; opacity:0.4;">
-                    <span style="position:absolute; color:var(--accent); font-size:0.6em; letter-spacing:2px;">[ GPS_OVR_ACTIVE ]</span>
+            <div class="panel">
+                <h3>LANCIATORI</h3><br>
+                <div class="grid-list">
+                    <div class="item-card">L-01 Alpha<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">L-02 Bravo<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">L-03 Charlie<br>Status: <span class="status-launched">Operativo</span></div>
+                    <div class="item-card">L-04 Delta<br>Status: <span class="status-nonop">Non Operativo</span></div>
                 </div>
             </div>
+        </section>
 
-            <div id="logs" class="page">
-                <div style="overflow-x:auto">
-                    <table style="width:100%; border-collapse:collapse; font-size:0.7em; min-width:400px;">
-                        <thead><tr style="color:var(--accent); border-bottom:1px solid var(--border)"><th style="padding:10px; text-align:left">TIME</th><th style="padding:10px; text-align:left">EVENT</th><th style="padding:10px; text-align:left">STATUS</th></tr></thead>
-                        <tbody id="logBody"></tbody>
-                    </table>
+        <section id="swarm">
+            <h2>Swarm Health Status</h2>
+            <div class="panel">
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>Bayraktar TB2 (X) - 100% (In Volo)</span>
+                    <div class="progress-container"><div class="progress-bar" style="width: 100%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>MQ-9 Reaper (A) - 45% (Manutenzione)</span>
+                    <div class="progress-container"><div class="progress-bar bar-yellow" style="width: 45%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>RQ-4 Global Hawk - 82% (Standby)</span>
+                    <div class="progress-container"><div class="progress-bar bar-yellow" style="width: 82%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>MQ-9 Reaper (B) - 0% (Distrutto)</span>
+                    <div class="progress-container"><div class="progress-bar bar-red" style="width: 0%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>Switchblade 300 - 0% (Detonato)</span>
+                    <div class="progress-container"><div class="progress-bar bar-red" style="width: 0%"></div></div>
                 </div>
             </div>
+        </section>
 
-            <div id="data" class="page">
-                <h3 style="font-size:0.8em; margin-bottom:15px; color:var(--accent)">ADVANCED DIAGNOSTICS</h3>
-                <div class="grid-stats">
-                    <div class="stat-card">
-                        <span class="stat-label">MAX Altitude</span>
-                        <span class="stat-value">4,250m</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">MAX Speed</span>
-                        <span class="stat-value">210km/h</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Current Absorption</span>
-                        <span class="stat-value">42.5A</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">GPS Satellites</span>
-                        <span class="stat-value">09</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Weather Cond.</span>
-                        <span class="stat-value" style="font-size: 0.8em; color: var(--amber);">STORMING</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Core Temp</span>
-                        <span class="stat-value">88°C</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Comm Link</span>
-                        <span class="stat-value" style="color:var(--red)">12%</span>
-                    </div>
+        <section id="map">
+            <h2>Tactical Map - Settore Cantù</h2>
+            <div class="panel">
+                <div id="mapContainer" style="height: 65vh; width: 100%; border: 1px solid var(--border-color);"></div>
+            </div>
+        </section>
+
+        <section id="log">
+            <h2>Flight & Event Logs</h2>
+            <div class="panel" style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Drone ID</th>
+                            <th>Time</th>
+                            <th>Event</th>
+                            <th>Event Position (WGS84 UTM)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody">
+                        </tbody>
+                </table>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-secondary);">
+                    *Lettura dati da log.json in corso...
+                </p>
+            </div>
+        </section>
+
+        <section id="data">
+            <h2>Telemetry & Sensors</h2>
+            <div class="panel">
+                <div class="grid-list">
+                    <div class="item-card"><strong>Max Altitudine:</strong><br>25.400 ft (7.741 m)</div>
+                    <div class="item-card"><strong>Max Speed:</strong><br>220 km/h (118 kts)</div>
+                    <div class="item-card"><strong>Current Absorption:</strong><br>45.2 A / 28V DC</div>
+                    <div class="item-card"><strong>GPS Satellite:</strong><br>14 Locked (3D Fix)</div>
+                    <div class="item-card"><strong>Weather Cond.:</strong><br>Vento 12 Kts NE - Visibilità CLR</div>
+                    <div class="item-card"><strong>Core Temperature:</strong><br>78.5 °C (Nominale)</div>
+                    <div class="item-card"><strong>Comm Link:</strong><br>AES-256 SATCOM - Signal 98%</div>
                 </div>
             </div>
+        </section>
 
-            <div id="settings" class="page">
-                <h3 style="font-size:0.8em; margin-bottom:15px;">SYSTEM MAINTENANCE</h3>
-                
-                <button class="btn-action" onclick="toggleTheme()">
-                    Change Interface Theme <span>◐</span>
-                </button>
-
-                <button class="btn-action btn-warning">
-                    Communication Reset <span>⟲</span>
-                </button>
-
-                <button class="btn-action btn-danger">
-                    Reboot System <span>⚠</span>
-                </button>
-                
-                <div style="margin-top:20px; padding:10px; border:1px dashed var(--border); font-size:0.55em; color:#555;">
-                    WARNING: System reboot requires manual GCS (Ground Control Station) reconnection.
-                </div>
+        <section id="settings">
+            <h2>System Settings</h2>
+            <div class="panel" style="max-width: 400px; margin: auto;">
+                <button class="btn" onclick="toggleTheme()">1. Toggle Theme (Light/Dark)</button>
+                <button class="btn" onclick="fakeAction('Reset Comunicazioni inizializzato...')">2. Reset Communications</button>
+                <button class="btn" onclick="fakeAction('Sincronizzazione Dati in corso...')">3. Data Sync</button>
+                <button class="btn" onclick="fakeAction('Riavvio Sistemi di Difesa...')">4. System Reboot</button>
+                <p id="settingsFeedback" style="text-align:center; margin-top:10px; color: var(--warn-yellow);"></p>
             </div>
-        </div>
+        </section>
     </main>
+</div>
 
-    <script>
-        function showPage(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
+<script>
+    // --- GESTIONE TAB ---
+    let mapInitialized = false;
+    let map;
+
+    function showTab(tabId, isMap = false) {
+        // Nascondi tutte le sezioni
+        document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
+        // Deseleziona tutti i bottoni
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+        
+        // Attiva la sezione richiesta
+        document.getElementById(tabId).classList.add('active');
+        // Trova il bottone corretto e attivalo (basato su onclick string)
+        const btn = document.querySelector(`nav button[onclick*="${tabId}"]`);
+        if(btn) btn.classList.add('active');
+
+        // Se si apre la mappa, bisogna fare il resize per Leaflet
+        if(isMap && !mapInitialized) {
+            initMap();
+            mapInitialized = true;
+        } else if (isMap && mapInitialized) {
+            setTimeout(() => map.invalidateSize(), 100);
         }
+    }
 
-        function toggleTheme() { document.body.classList.toggle('light-theme'); }
+    // --- GESTIONE MAPPA (Cantù) ---
+    function initMap() {
+        // Coordinate di Cantù
+        map = L.map('mapContainer').setView([45.7410, 9.1278], 13);
+        
+        // Mappa topografica
+        L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap'
+        }).addTo(map);
 
-        async function loadLogs() {
-            try {
-                const response = await fetch('log_drone.json');
-                const data = await response.json();
-                document.getElementById('logBody').innerHTML = data.map(e => `
-                    <tr style="border-bottom:1px solid var(--border)">
-                        <td style="padding:10px">${e.timestamp}</td>
-                        <td style="padding:10px">${e.type}</td>
-                        <td style="padding:10px; color:${e.status === 'OK' ? 'var(--green)' : 'var(--red)'}">${e.status}</td>
-                    </tr>
-                `).join('');
-            } catch (e) { 
-                document.getElementById('logBody').innerHTML = '<tr><td colspan="3" style="padding:20px; text-align:center; color:#555">Log data unavailable</td></tr>';
-            }
+        // Marker finti per la simulazione
+        L.circleMarker([45.745, 9.130], {color: 'red', radius: 8}).addTo(map).bindPopup("Target Alpha");
+        L.circleMarker([45.730, 9.120], {color: '#00ffcc', radius: 5}).addTo(map).bindPopup("Bayraktar TB2 - Position");
+        L.circleMarker([45.750, 9.140], {color: 'yellow', radius: 5}).addTo(map).bindPopup("Lanciatore L-03 (Operativo)");
+    }
+
+    // --- GESTIONE TEMA ---
+    function toggleTheme() {
+        const html = document.documentElement;
+        if (html.getAttribute('data-theme') === 'dark') {
+            html.setAttribute('data-theme', 'light');
+        } else {
+            html.setAttribute('data-theme', 'dark');
         }
+    }
 
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.getUTCHours().toString().padStart(2, '0') + ":" + 
-                                                       now.getUTCMinutes().toString().padStart(2, '0') + ":" + 
-                                                       now.getUTCSeconds().toString().padStart(2, '0') + " UTC";
-        }, 1000);
+    // --- FAKE BUTTONS SETTINGS ---
+    function fakeAction(msg) {
+        const feedback = document.getElementById('settingsFeedback');
+        feedback.innerText = msg;
+        setTimeout(() => { feedback.innerText = ""; }, 3000);
+    }
 
-        window.onload = loadLogs;
-    </script>
+    // --- CARICAMENTO LOG DA FILE ESTERNO ---
+    async function loadLogs() {
+        const tbody = document.getElementById('logTableBody');
+        
+        // Dati di Fallback se non esiste il file log.json
+        const fallbackData = [
+            {"id": "Bayraktar TB2", "time": "08:14:22", "event": "Takeoff Clearance", "pos": "32T 509800E 5065300N", "status": "Launched"},
+            {"id": "Bayraktar TB2", "time": "08:18:00", "event": "WayPoint 1 Reached", "pos": "32T 510100E 5066000N", "status": "In Volo"},
+            {"id": "MQ-9 Reaper (B)", "time": "07:55:10", "event": "Missile Lock Detected", "pos": "32T 508000E 5064000N", "status": "Evasive maneuvers"},
+            {"id": "MQ-9 Reaper (B)", "time": "07:56:02", "event": "Telemetry Lost", "pos": "32T 508200E 5064100N", "status": "Abbattuto"}
+        ];
+
+        try {
+            // Tenta di caricare il file "log.json"
+            const response = await fetch('log.json');
+            if (!response.ok) throw new Error("File non trovato");
+            const data = await response.json();
+            renderTable(data, tbody);
+        } catch (error) {
+            console.log("File log.json non rilevato. Caricamento dati di fallback.");
+            renderTable(fallbackData, tbody);
+        }
+    }
+
+    function renderTable(dataArray, container) {
+        container.innerHTML = "";
+        dataArray.forEach(row => {
+            let statusClass = "";
+            if(row.status.toLowerCase().includes("abbattuto")) statusClass = "status-abbattuto";
+            if(row.status.toLowerCase().includes("launched") || row.status.toLowerCase().includes("volo")) statusClass = "status-launched";
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.id}</td>
+                <td>${row.time}</td>
+                <td>${row.event}</td>
+                <td>${row.pos}</td>
+                <td class="${statusClass}">${row.status}</td>
+            `;
+            container.appendChild(tr);
+        });
+    }
+
+    // Inizializza la tabella log al caricamento
+    window.onload = loadLogs;
+</script>
+
 </body>
 </html>
