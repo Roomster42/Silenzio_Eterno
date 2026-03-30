@@ -201,20 +201,20 @@
             <div class="panel">
                 <h3>DRONES</h3><br>
                 <div class="grid-list">
-                    <div class="item-card">ID: MQ-9 Reaper (A)<br>Status: <span class="status-nonop">Non Operativo</span></div>
-                    <div class="item-card">ID: MQ-9 Reaper (B)<br>Status: <span class="status-abbattuto">Abbattuto</span></div>
-                    <div class="item-card">ID: RQ-4 Global Hawk<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">ID: MQ-9 Reaper (A)<br>Status: <span class="status-nonop">Inactive</span></div>
+                    <div class="item-card">ID: MQ-9 Reaper (B)<br>Status: <span class="status-abbattuto">Shot Down</span></div>
+                    <div class="item-card">ID: RQ-4 Global Hawk<br>Status: <span class="status-nonop">Inactive</span></div>
                     <div class="item-card">ID: Bayraktar TB2 (X)<br>Status: <span class="status-launched">Launched</span></div>
-                    <div class="item-card">ID: Switchblade 300<br>Status: <span class="status-abbattuto">Abbattuto</span></div>
+                    <div class="item-card">ID: Switchblade 300<br>Status: <span class="status-abbattuto">Shot Down</span></div>
                 </div>
             </div>
             <div class="panel">
                 <h3>LAUNCHERS</h3><br>
                 <div class="grid-list">
-                    <div class="item-card">L-01 Alpha<br>Status: <span class="status-nonop">Non Operativo</span></div>
-                    <div class="item-card">L-02 Bravo<br>Status: <span class="status-nonop">Non Operativo</span></div>
-                    <div class="item-card">L-03 Charlie<br>Status: <span class="status-launched">Operativo</span></div>
-                    <div class="item-card">L-04 Delta<br>Status: <span class="status-nonop">Non Operativo</span></div>
+                    <div class="item-card">L-01 Alpha<br>Status: <span class="status-nonop">Inactive</span></div>
+                    <div class="item-card">L-02 Bravo<br>Status: <span class="status-nonop">Inactive</span></div>
+                    <div class="item-card">L-03 Charlie<br>Status: <span class="status-launched">Active</span></div>
+                    <div class="item-card">L-04 Delta<br>Status: <span class="status-nonop">Inactive</span></div>
                 </div>
             </div>
         </section>
@@ -342,7 +342,7 @@
         // Marker finti per la simulazione
         L.circleMarker([45.745, 9.130], {color: 'red', radius: 8}).addTo(map).bindPopup("Target Alpha");
         L.circleMarker([45.730, 9.120], {color: '#00ffcc', radius: 5}).addTo(map).bindPopup("Bayraktar TB2 - Position");
-        L.circleMarker([45.750, 9.140], {color: 'yellow', radius: 5}).addTo(map).bindPopup("Lanciatore L-03 (Operativo)");
+        L.circleMarker([45.750, 9.140], {color: 'yellow', radius: 5}).addTo(map).bindPopup("Lanciatore L-03 (Active)");
     }
 
     // --- GESTIONE TEMA ---
@@ -371,7 +371,7 @@
             {"id": "Bayraktar TB2", "time": "08:14:22", "event": "Takeoff Clearance", "pos": "32T 509800E 5065300N", "status": "Launched"},
             {"id": "Bayraktar TB2", "time": "08:18:00", "event": "WayPoint 1 Reached", "pos": "32T 510100E 5066000N", "status": "In Volo"},
             {"id": "MQ-9 Reaper (B)", "time": "07:55:10", "event": "Missile Lock Detected", "pos": "32T 508000E 5064000N", "status": "Evasive maneuvers"},
-            {"id": "MQ-9 Reaper (B)", "time": "07:56:02", "event": "Telemetry Lost", "pos": "32T 508200E 5064100N", "status": "Abbattuto"}
+            {"id": "MQ-9 Reaper (B)", "time": "07:56:02", "event": "Telemetry Lost", "pos": "32T 508200E 5064100N", "status": "Shot Down"}
         ];
 
         try {
