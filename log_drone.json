@@ -1,35 +1,16 @@
 [
   {
-    "id": "E001",
-    "timestamp": "10:30:01",
-    "tipo": "DECOLLO",
-    "descrizione": "Decollo automatico riuscito",
-    "coordinate": "34.0522 N / 118.2437 W",
-    "altitudine": "0",
-    "velocita": "0",
-    "stato": "OK",
-    "note": "-"
+    "id": "Drone Fantasma",
+    "time": "14:30:12",
+    "event": "Ricognizione iniziata",
+    "pos": "32T 512300E 5068200N",
+    "status": "In Volo"
   },
   {
-    "id": "E002",
-    "timestamp": "10:31:15",
-    "tipo": "SALITA",
-    "descrizione": "Salita a quota di crociera",
-    "coordinate": "34.0535 N / 118.2450 W",
-    "altitudine": "500",
-    "velocita": "150",
-    "stato": "OK",
-    "note": "-"
-  },
-  {
-    "id": "E004",
-    "timestamp": "10:38:22",
-    "tipo": "VIRATA STRETTA",
-    "descrizione": "Virata a sinistra 90°",
-    "coordinate": "34.0625 N / 118.2615 W",
-    "altitudine": "1500",
-    "velocita": "160",
-    "stato": "ANOMALIA",
-    "note": "Vibrazione insolita"
+    "id": "Switchblade 300",
+    "time": "14:45:00",
+    "event": "Impatto confermato",
+    "pos": "32T 513000E 5069000N",
+    "status": "Abbattuto"
   }
 ]
