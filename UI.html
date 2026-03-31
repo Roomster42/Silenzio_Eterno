@@ -113,8 +113,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- Media Queries per Orientamento Schermo --- */
-        /* Verticale (Portrait) */
+        /* --- Media Queries --- */
         @media (orientation: portrait) {
             .app-container { flex-direction: column; }
             nav {
@@ -127,7 +126,6 @@
             nav button.active { border-left: none; border-bottom-color: var(--text-primary); }
         }
 
-        /* Orizzontale (Landscape) */
         @media (orientation: landscape) {
             .app-container { flex-direction: row; }
             nav {
@@ -138,7 +136,6 @@
             }
         }
 
-        /* Elementi UI comuni */
         .panel {
             background-color: var(--bg-panel);
             border: 1px solid var(--border-color);
@@ -151,30 +148,21 @@
         h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
 
         .status-abbattuto { color: var(--alert-red); }
-        .status-damaged { color: var(--warn-yellow); }
-        .status-detonated { color: var(--alert-red); }
         .status-nonop { color: var(--warn-yellow); }
         .status-launched { color: var(--ok-green); text-shadow: 0 0 5px var(--ok-green); }
 
-        /* Dashboard Grid */
         .grid-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         .item-card { border: 1px solid var(--border-color); padding: 15px; background: rgba(0,0,0,0.2); }
 
-        /* Swarm Bars */
         .progress-container { width: 100%; background: #333; height: 20px; margin-top: 5px; border-radius: 2px; overflow: hidden; }
         .progress-bar { height: 100%; background-color: var(--ok-green); }
         .bar-red { background-color: var(--alert-red); }
         .bar-yellow { background-color: var(--warn-yellow); }
 
-        /* Table Log */
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
         th { background-color: rgba(0, 255, 204, 0.1); color: var(--text-primary); }
 
-        /* Map */
-        #map { height: 60vh; width: 100%; border: 2px solid var(--border-color); border-radius: 4px; }
-
-        /* Settings Buttons */
         .btn {
             display: block; width: 100%; padding: 15px; margin-bottom: 15px;
             background: var(--bg-base); border: 1px solid var(--border-color);
@@ -182,7 +170,6 @@
             cursor: pointer; text-transform: uppercase; transition: 0.2s;
         }
         .btn:hover { background: rgba(0, 255, 204, 0.2); }
-        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -191,8 +178,8 @@
     <nav id="mainMenu">
         <button class="active" onclick="showTab('dashboard')">Dashboard</button>
         <button onclick="showTab('swarm')">Drones Swarm</button>
-        <button onclick="showTab('map', true)">Map</button>
         <button onclick="showTab('log')">Log</button>
+        <button onclick="showTab('map', true)">Map</button>
         <button onclick="showTab('data')">Data</button>
         <button onclick="showTab('settings')">Settings</button>
     </nav>
@@ -237,20 +224,13 @@
                     <div class="progress-container"><div class="progress-bar bar-yellow" style="width: 82%"></div></div>
                 </div>
                 <div class="item-card" style="margin-bottom:15px">
-                    <span>MQ-9 Reaper (B) - 0% (Destroyed)</span>
+                    <span>MQ-9 Reaper (B) - 5% (Destroyed)</span>
                     <div class="progress-container"><div class="progress-bar bar-red" style="width: 5%"></div></div>
                 </div>
                 <div class="item-card" style="margin-bottom:15px">
-                    <span>Switchblade 300 - 0% (Detonated)</span>
+                    <span>Switchblade 300 - 5% (Detonated)</span>
                     <div class="progress-container"><div class="progress-bar bar-red" style="width: 5%"></div></div>
                 </div>
-            </div>
-        </section>
-
-        <section id="map">
-            <h2>Tactical Map - Settore Cantù</h2>
-            <div class="panel">
-                <div id="mapContainer" style="height: 65vh; width: 100%; border: 1px solid var(--border-color);"></div>
             </div>
         </section>
 
@@ -267,12 +247,15 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="logTableBody">
-                        </tbody>
+                    <tbody id="logTableBody"></tbody>
                 </table>
-                <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-secondary);">
-                    *Lettura dati in corso...
-                </p>
+            </div>
+        </section>
+
+        <section id="map">
+            <h2>Tactical Map - Settore Sesto Calende</h2>
+            <div class="panel">
+                <div id="mapContainer" style="height: 65vh; width: 100%; border: 1px solid var(--border-color);"></div>
             </div>
         </section>
 
@@ -280,13 +263,13 @@
             <h2>Telemetry & Sensors</h2>
             <div class="panel">
                 <div class="grid-list">
-                    <div class="item-card"><strong>Max Altitudine:</strong><br>25.400 ft (7.741 m)</div>
-                    <div class="item-card"><strong>Max Speed:</strong><br>220 km/h (118 kts)</div>
-                    <div class="item-card"><strong>Current Absorption:</strong><br>45.2 A / 28V DC</div>
-                    <div class="item-card"><strong>GPS Satellite:</strong><br>14 Locked (3D Fix)</div>
-                    <div class="item-card"><strong>Weather Cond.:</strong><br>Wind 12 Kts NE - Visibility CLR</div>
-                    <div class="item-card"><strong>Core Temperature:</strong><br>78.5 °C (Nominal)</div>
-                    <div class="item-card"><strong>Comm Link:</strong><br>AES-256 SATCOM - Signal 98%</div>
+                    <div class="item-card"><strong>Max Altitudine:</strong><br>25.400 ft</div>
+                    <div class="item-card"><strong>Max Speed:</strong><br>220 km/h</div>
+                    <div class="item-card"><strong>Current Absorption:</strong><br>45.2 A</div>
+                    <div class="item-card"><strong>GPS Satellite:</strong><br>14 Locked</div>
+                    <div class="item-card"><strong>Weather Cond.:</strong><br>Wind 12 Kts NE</div>
+                    <div class="item-card"><strong>Core Temperature:</strong><br>78.5 °C</div>
+                    <div class="item-card"><strong>Comm Link:</strong><br>Signal 98%</div>
                 </div>
             </div>
         </section>
@@ -295,9 +278,9 @@
             <h2>System Settings</h2>
             <div class="panel" style="max-width: 400px; margin: auto;">
                 <button class="btn" onclick="toggleTheme()">1. Toggle Theme (Light/Dark)</button>
-                <button class="btn" onclick="fakeAction('Communications Reset initialized...')">2. Reset Communications</button>
-                <button class="btn" onclick="fakeAction('Data synchronization in progress...')">3. Data Sync</button>
-                <button class="btn" onclick="fakeAction('Restarting Control Systems...')">4. System Reboot</button>
+                <button class="btn" onclick="fakeAction('Reset...')">2. Reset Communications</button>
+                <button class="btn" onclick="fakeAction('Sync...')">3. Data Sync</button>
+                <button class="btn" onclick="fakeAction('Reboot...')">4. System Reboot</button>
                 <p id="settingsFeedback" style="text-align:center; margin-top:10px; color: var(--warn-yellow);"></p>
             </div>
         </section>
@@ -305,23 +288,17 @@
 </div>
 
 <script>
-    // --- GESTIONE TAB ---
     let mapInitialized = false;
     let map;
 
     function showTab(tabId, isMap = false) {
-        // Nascondi tutte le sezioni
         document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
-        // Deseleziona tutti i bottoni
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
         
-        // Attiva la sezione richiesta
         document.getElementById(tabId).classList.add('active');
-        // Trova il bottone corretto e attivalo (basato su onclick string)
         const btn = document.querySelector(`nav button[onclick*="${tabId}"]`);
         if(btn) btn.classList.add('active');
 
-        // Se si apre la mappa, bisogna fare il resize per Leaflet
         if(isMap && !mapInitialized) {
             initMap();
             mapInitialized = true;
@@ -330,86 +307,76 @@
         }
     }
 
-    // --- GESTIONE MAPPA (Cantù) ---
     function initMap() {
-        // Coordinate di Cantù
-        map = L.map('mapContainer').setView([45.7410, 9.1278], 13);
+        // Coordinate di Sesto Calende
+        const sestoCalende = [45.7235, 8.6355];
+        map = L.map('mapContainer').setView(sestoCalende, 14);
         
-        // Mappa topografica
         L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
             maxZoom: 17,
-            attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap'
+            attribution: 'OpenTopoMap'
         }).addTo(map);
 
-        // Marker finti per la simulazione
-        L.circleMarker([45.745, 9.130], {color: 'red', radius: 8}).addTo(map).bindPopup("Target Alpha");
-        L.circleMarker([45.730, 9.120], {color: '#00ffcc', radius: 5}).addTo(map).bindPopup("Bayraktar TB2 - Position");
-        L.circleMarker([45.750, 9.140], {color: 'yellow', radius: 5}).addTo(map).bindPopup("Lanciatore L-03 (Active)");
+        // AREA POLIGONALE ROSSA (Zona Operativa a Sesto Calende)
+        const latlngs = [
+            [45.732, 8.625],
+            [45.735, 8.645],
+            [45.718, 8.655],
+            [45.712, 8.635]
+        ];
+        const areaRossa = L.polygon(latlngs, {
+            color: 'red', 
+            fillColor: '#f03', 
+            fillOpacity: 0.4,
+            weight: 2
+        }).addTo(map);
+        areaRossa.bindPopup("OPERATIONAL AREA: RESTRICTED");
+
+        // Marker tattici aggiornati alla zona
+        L.circleMarker([45.725, 8.630], {color: '#00ffcc', radius: 6}).addTo(map).bindPopup("UAV Current Position");
+        L.circleMarker([45.715, 8.645], {color: 'yellow', radius: 6}).addTo(map).bindPopup("HQ Relay Station");
     }
 
-    // --- GESTIONE TEMA ---
     function toggleTheme() {
         const html = document.documentElement;
-        if (html.getAttribute('data-theme') === 'dark') {
-            html.setAttribute('data-theme', 'light');
-        } else {
-            html.setAttribute('data-theme', 'dark');
-        }
+        html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
 
-    // --- FAKE BUTTONS SETTINGS ---
     function fakeAction(msg) {
-        const feedback = document.getElementById('settingsFeedback');
-        feedback.innerText = msg;
-        setTimeout(() => { feedback.innerText = ""; }, 3000);
+        const f = document.getElementById('settingsFeedback');
+        f.innerText = msg;
+        setTimeout(() => f.innerText = "", 3000);
     }
 
-    // --- CARICAMENTO LOG DA FILE ESTERNO ---
     async function loadLogs() {
         const tbody = document.getElementById('logTableBody');
-        
-        // Dati di Fallback se non esiste il file log_drone_json
         const fallbackData = [
-            {"id": "Bayraktar TB2", "time": "08:14:22", "event": "Takeoff Clearance", "pos": "32T 509800E 5065300N", "status": "Launched"},
-            {"id": "Bayraktar TB2", "time": "08:18:00", "event": "WayPoint 1 Reached", "pos": "32T 510100E 5066000N", "status": "In Volo"},
-            {"id": "MQ-9 Reaper (B)", "time": "07:55:10", "event": "Missile Lock Detected", "pos": "32T 508000E 5064000N", "status": "Evasive maneuvers"},
-            {"id": "MQ-9 Reaper (B)", "time": "07:56:02", "event": "Telemetry Lost", "pos": "32T 508200E 5064100N", "status": "Shot Down"}
+            {"id": "Bayraktar TB2", "time": "14:10:05", "event": "Entering Sesto Sector", "pos": "32T 471600E 5063400N", "status": "In Flight"},
+            {"id": "Bayraktar TB2", "time": "14:15:22", "event": "Scanning Area Red", "pos": "32T 472100E 5063800N", "status": "Launched"}
         ];
 
         try {
-            // Tenta di caricare il file "log.json"
-            const response = await fetch('log.json');
-            if (!response.ok) throw new Error("File non trovato");
-            const data = await response.json();
+            const r = await fetch('log.json');
+            const data = r.ok ? await r.json() : fallbackData;
             renderTable(data, tbody);
-        } catch (error) {
-            console.log("File log.json non rilevato. Caricamento dati di fallback.");
+        } catch (e) {
             renderTable(fallbackData, tbody);
         }
     }
 
-    function renderTable(dataArray, container) {
-        container.innerHTML = "";
-        dataArray.forEach(row => {
-            let statusClass = "";
-            if(row.status.toLowerCase().includes("abbattuto")) statusClass = "status-abbattuto";
-            if(row.status.toLowerCase().includes("launched") || row.status.toLowerCase().includes("volo")) statusClass = "status-launched";
-            
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${row.id}</td>
-                <td>${row.time}</td>
-                <td>${row.event}</td>
-                <td>${row.pos}</td>
-                <td class="${statusClass}">${row.status}</td>
-            `;
-            container.appendChild(tr);
-        });
+    function renderTable(d, c) {
+        c.innerHTML = d.map(r => `
+            <tr>
+                <td>${r.id}</td>
+                <td>${r.time}</td>
+                <td>${r.event}</td>
+                <td>${r.pos}</td>
+                <td class="${r.status.toLowerCase().includes('shot') ? 'status-abbattuto' : 'status-launched'}">${r.status}</td>
+            </tr>
+        `).join('');
     }
 
-    // Inizializza la tabella log al caricamento
     window.onload = loadLogs;
 </script>
-
 </body>
 </html>
