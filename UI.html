@@ -312,9 +312,9 @@
         const sestoCalende = [45.7235, 8.6355];
         map = L.map('mapContainer').setView(sestoCalende, 14);
         
-        L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            maxZoom: 17,
-            attribution: 'OpenTopoMap'
+       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
         }).addTo(map);
 
         // AREA POLIGONALE ROSSA (Zona Operativa a Sesto Calende)
@@ -333,8 +333,8 @@
         areaRossa.bindPopup("OPERATIONAL AREA: RESTRICTED");
 
         // Marker tattici aggiornati alla zona
-        L.circleMarker([45.725, 8.630], {color: '#00ffcc', radius: 6}).addTo(map).bindPopup("UAV Current Position");
-        L.circleMarker([45.715, 8.645], {color: 'yellow', radius: 6}).addTo(map).bindPopup("HQ Relay Station");
+        // L.circleMarker([45.725, 8.630], {color: '#00ffcc', radius: 6}).addTo(map).bindPopup("UAV Current Position");
+        // L.circleMarker([45.715, 8.645], {color: 'yellow', radius: 6}).addTo(map).bindPopup("HQ Relay Station");
     }
 
     function toggleTheme() {
