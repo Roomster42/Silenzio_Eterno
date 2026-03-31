@@ -375,13 +375,13 @@
         ];
 
         try {
-            // Tenta di caricare il file "log_drone_json"
-            const response = await fetch('log_drone_json');
+            // Tenta di caricare il file "log.json"
+            const response = await fetch('log.json');
             if (!response.ok) throw new Error("File non trovato");
             const data = await response.json();
             renderTable(data, tbody);
         } catch (error) {
-            console.log("File log_drone_json non rilevato. Caricamento dati di fallback.");
+            console.log("File log.json non rilevato. Caricamento dati di fallback.");
             renderTable(fallbackData, tbody);
         }
     }
