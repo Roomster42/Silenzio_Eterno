@@ -1,16 +1,114 @@
 [
   {
-    "id": "Drone Fantasma",
-    "time": "14:30:12",
-    "event": "Ricognizione iniziata",
-    "pos": "32T 512300E 5068200N",
-    "status": "In Volo"
+    "id": "Switchblade 300",
+    "time": "03:45:00",
+    "event": "Hit",
+    "pos": "Flew Straight for 666m",
+    "status": "Damaged"
   },
   {
     "id": "Switchblade 300",
-    "time": "14:45:00",
-    "event": "Impatto confermato",
-    "pos": "32T 513000E 5069000N",
+    "time": "03:45:10",
+    "event": "Start Auto-Destruction",
+    "pos": "Lost GPS Connection",
     "status": "Abbattuto"
+  },
+   {
+    "id": "Switchblade 300",
+    "time": "03:45:15",
+    "event": "Destruction",
+    "pos": "Lost GPS Connection",
+    "status": "Detonated"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:12",
+    "event": "Takeoff",
+    "pos": "Direction 44° N",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:35",
+    "event": "Flying",
+    "pos": "Flew Straight for 1430m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:35",
+    "event": "Turn",
+    "pos": "Direction 132° N",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:47",
+    "event": "Flying",
+    "pos": "Flew Straight for 860m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:47",
+    "event": "Turn",
+    "pos": "Direction 164° N",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:31:21",
+    "event": "Flying",
+    "pos": "Flew Straight for 2070m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:31:21",
+    "event": "Turn",
+    "pos": "Direction 225° N",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:31:57",
+    "event": "Flying",
+    "pos": "Flew Straight for 2230m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:31:57",
+    "event": "Turn",
+    "pos": "Direction 12° N",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:32:14",
+    "event": "Flying",
+    "pos": "Flew Straight for 1070m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:32:14",
+    "event": "Turn",
+    "pos": "Direction 282° N",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:32:23",
+    "event": "Flying",
+    "pos": "Flew Straight for 590m",
+    "status": "Operative"
+  },
+    {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:42:12",
+    "event": "Check GPS position",
+    "pos": "32T 0472738 5066902",
+    "status": "Operative"
   }
 ]
