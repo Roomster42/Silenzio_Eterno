@@ -2,7 +2,7 @@
   {
     "id": "Switchblade 300",
     "time": "03:45:00",
-    "event": "Hit",
+    "event": "Hitted",
     "pos": "Flew Straight for 666m",
     "status": "Damaged"
   },
