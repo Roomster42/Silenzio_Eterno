@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UAV Combat Control Interface</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
         /* Variabili di Tema: High-Tech / Mil-Spec */
@@ -179,7 +176,6 @@
         <button class="active" onclick="showTab('dashboard')">Dashboard</button>
         <button onclick="showTab('swarm')">Drones Swarm</button>
         <button onclick="showTab('log')">Log</button>
-        <button onclick="showTab('map', true)">Map</button>
         <button onclick="showTab('data')">Data</button>
         <button onclick="showTab('settings')">Settings</button>
     </nav>
@@ -252,13 +248,6 @@
             </div>
         </section>
 
-        <section id="map">
-            <h2>Tactical Map</h2>
-            <div class="panel">
-                <div id="mapContainer" style="height: 65vh; width: 100%; border: 1px solid var(--border-color);"></div>
-            </div>
-        </section>
-
         <section id="data">
             <h2>Telemetry & Sensors</h2>
             <div class="panel">
@@ -288,70 +277,34 @@
 </div>
 
 <script>
-    let mapInitialized = false;
-    let map;
-
-    function showTab(tabId, isMap = false) {
+    // --- GESTIONE TAB SEMPLIFICATA ---
+    function showTab(tabId) {
         document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
         
         document.getElementById(tabId).classList.add('active');
         const btn = document.querySelector(`nav button[onclick*="${tabId}"]`);
         if(btn) btn.classList.add('active');
-
-        if(isMap && !mapInitialized) {
-            initMap();
-            mapInitialized = true;
-        } else if (isMap && mapInitialized) {
-            setTimeout(() => map.invalidateSize(), 100);
-        }
     }
 
-    function initMap() {
-        // Coordinate di Sesto Calende
-        const sestoCalende = [45.76574, 8.66544];
-        map = L.map('mapContainer').setView(sestoCalende, 14);
-        
-       L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            maxZoom: 13,
-            attribution: 'OpenTopoMap'
-        }).addTo(map);
-
-        // AREA POLIGONALE ROSSA (Zona Operativa a Sesto Calende)
-        const latlngs = [
-            [45.784, 8.639],
-            [45.783, 8.693],
-            [45.741, 8.688],
-            [45.744, 8.637]
-        ];
-        const areaRossa = L.polygon(latlngs, {
-            color: 'red', 
-            fillColor: '#f03', 
-            fillOpacity: 0.4,
-            weight: 2
-        }).addTo(map);
-        areaRossa.bindPopup("OPERATIONAL AREA: RESTRICTED");
-
-        // Marker tattici aggiornati alla zona
-        // L.circleMarker([45.725, 8.630], {color: '#00ffcc', radius: 6}).addTo(map).bindPopup("UAV Current Position");
-        // L.circleMarker([45.715, 8.645], {color: 'yellow', radius: 6}).addTo(map).bindPopup("HQ Relay Station");
-    }
-
+    // --- GESTIONE TEMA ---
     function toggleTheme() {
         const html = document.documentElement;
         html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
 
+    // --- FAKE BUTTONS SETTINGS ---
     function fakeAction(msg) {
         const f = document.getElementById('settingsFeedback');
         f.innerText = msg;
         setTimeout(() => f.innerText = "", 3000);
     }
 
+    // --- CARICAMENTO LOG ---
     async function loadLogs() {
         const tbody = document.getElementById('logTableBody');
         const fallbackData = [
-            {"id": "Bayraktar TB2", "time": "14:10:05", "event": "Entering Sesto Sector", "pos": "32T 471600E 5063400N", "status": "In Flight"},
+            {"id": "Bayraktar TB2", "time": "14:10:05", "event": "Entering Sector", "pos": "32T 471600E 5063400N", "status": "In Flight"},
             {"id": "Bayraktar TB2", "time": "14:15:22", "event": "Scanning Area Red", "pos": "32T 472100E 5063800N", "status": "Launched"}
         ];
 
