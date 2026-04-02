@@ -24,89 +24,61 @@
     "id": "Bayraktar TB2 (X)",
     "time": "06:30:12",
     "event": "Takeoff",
-    "pos": "Direction 44° N",
+    "pos": "Direction 78° TN",
     "status": "Operative"
   },
   {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:30:35",
+    "time": "06:30:28",
     "event": "Flying",
-    "pos": "Flew Straight for 1430m",
+    "pos": "Flew Straight for 980m",
     "status": "Operative"
   },
   {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:30:35",
+    "time": "06:30:28",
     "event": "Turn",
-    "pos": "Direction 132° N",
+    "pos": "Direction 24° TN",
     "status": "Operative"
   },
   {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:30:47",
+    "time": "06:30:42",
     "event": "Flying",
-    "pos": "Flew Straight for 860m",
+    "pos": "Flew Straight for 865m",
     "status": "Operative"
   },
   {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:30:47",
+    "time": "06:30:42",
     "event": "Turn",
-    "pos": "Direction 164° N",
+    "pos": "Direction 327° TN",
     "status": "Operative"
   },
   {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:31:21",
+    "time": "06:30:50",
     "event": "Flying",
-    "pos": "Flew Straight for 2070m",
+    "pos": "Flew Straight for 495m",
     "status": "Operative"
   },
   {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:31:21",
+    "time": "06:30:50",
     "event": "Turn",
-    "pos": "Direction 225° N",
+    "pos": "Direction 267° TN",
     "status": "Operative"
   },
   {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:31:57",
+    "time": "06:30:57",
     "event": "Flying",
-    "pos": "Flew Straight for 2230m",
-    "status": "Operative"
-  },
-  {
-    "id": "Bayraktar TB2 (X)",
-    "time": "06:31:57",
-    "event": "Turn",
-    "pos": "Direction 12° N",
-    "status": "Operative"
-  },
-  {
-    "id": "Bayraktar TB2 (X)",
-    "time": "06:32:14",
-    "event": "Flying",
-    "pos": "Flew Straight for 1070m",
-    "status": "Operative"
-  },
-  {
-    "id": "Bayraktar TB2 (X)",
-    "time": "06:32:14",
-    "event": "Turn",
-    "pos": "Direction 282° N",
-    "status": "Operative"
-  },
-  {
-    "id": "Bayraktar TB2 (X)",
-    "time": "06:32:23",
-    "event": "Flying",
-    "pos": "Flew Straight for 590m",
+    "pos": "Flew Straight for 375m",
     "status": "Operative"
   },
     {
     "id": "Bayraktar TB2 (X)",
-    "time": "06:42:12",
+    "time": "06:30:57",
     "event": "Check GPS position",
     "pos": "32T 0472738 5066902",
     "status": "Operative"
