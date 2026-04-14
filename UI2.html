@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UAV Combat Control Interface</title>
+
+    <style>
+        /* Variabili di Tema: High-Tech / Mil-Spec */
+        :root {
+            --bg-base: #0a0e17;
+            --bg-panel: #111827;
+            --text-primary: #00ffcc;
+            --text-secondary: #00b38f;
+            --text-light: #e5e7eb;
+            --border-color: #00ffcc40;
+            --alert-red: #ff3333;
+            --warn-yellow: #ffcc00;
+            --ok-green: #00ff66;
+            --font-main: 'Courier New', Courier, monospace;
+        }
+
+        [data-theme="light"] {
+            --bg-base: #e5e7eb;
+            --bg-panel: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-light: #1f2937;
+            --border-color: #9ca3af;
+            --alert-red: #dc2626;
+            --warn-yellow: #d97706;
+            --ok-green: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Navigazione */
+        nav {
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            z-index: 1000;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 15px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        nav button:hover {
+            color: var(--text-primary);
+            background-color: rgba(0, 255, 204, 0.1);
+        }
+
+        nav button.active {
+            color: var(--text-primary);
+            border-left-color: var(--text-primary);
+            background-color: rgba(0, 255, 204, 0.15);
+            text-shadow: 0 0 8px var(--text-primary);
+        }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Media Queries --- */
+        @media (orientation: portrait) {
+            .app-container { flex-direction: column; }
+            nav {
+                flex-direction: row;
+                overflow-x: auto;
+                white-space: nowrap;
+                border-right: none;
+            }
+            nav button { border-left: none; border-bottom: 3px solid transparent; }
+            nav button.active { border-left: none; border-bottom-color: var(--text-primary); }
+        }
+
+        @media (orientation: landscape) {
+            .app-container { flex-direction: row; }
+            nav {
+                flex-direction: column;
+                width: 200px;
+                min-width: 200px;
+                border-bottom: none;
+            }
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
+
+        .status-abbattuto { color: var(--alert-red); }
+        .status-nonop { color: var(--warn-yellow); }
+        .status-launched { color: var(--ok-green); text-shadow: 0 0 5px var(--ok-green); }
+
+        .grid-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .item-card { border: 1px solid var(--border-color); padding: 15px; background: rgba(0,0,0,0.2); }
+
+        .progress-container { width: 100%; background: #333; height: 20px; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .progress-bar { height: 100%; background-color: var(--ok-green); }
+        .bar-red { background-color: var(--alert-red); }
+        .bar-yellow { background-color: var(--warn-yellow); }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
+        th { background-color: rgba(0, 255, 204, 0.1); color: var(--text-primary); }
+
+        .btn {
+            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
+            background: var(--bg-base); border: 1px solid var(--border-color);
+            color: var(--text-primary); font-family: var(--font-main); font-size: 1rem;
+            cursor: pointer; text-transform: uppercase; transition: 0.2s;
+        }
+        .btn:hover { background: rgba(0, 255, 204, 0.2); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <nav id="mainMenu">
+        <button class="active" onclick="showTab('dashboard')">Dashboard</button>
+        <button onclick="showTab('swarm')">Drones Swarm</button>
+        <button onclick="showTab('log')">Log</button>
+        <button onclick="showTab('data')">Data</button>
+        <button onclick="showTab('settings')">Settings</button>
+    </nav>
+
+    <main>
+        <section id="dashboard" class="active">
+            <h2>System Dashboard</h2>
+            <div class="panel">
+                <h3>DRONES</h3><br>
+                <div class="grid-list">
+                    <div class="item-card">ID: MQ-9 Reaper (A)<br>Status: <span class="status-nonop">Inactive</span></div>
+                    <div class="item-card">ID: MQ-9 Reaper (B)<br>Status: <span class="status-abbattuto">Shot Down</span></div>
+                    <div class="item-card">ID: RQ-4 Global Hawk<br>Status: <span class="status-nonop">Inactive</span></div>
+                    <div class="item-card">ID: Bayraktar TB2 (X)<br>Status: <span class="status-launched">Launched</span></div>
+                    <div class="item-card">ID: Switchblade 300<br>Status: <span class="status-abbattuto">Shot Down</span></div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>LAUNCHERS</h3><br>
+                <div class="grid-list">
+                    <div class="item-card">L-01 Alpha<br>Status: <span class="status-nonop">Inactive</span></div>
+                    <div class="item-card">L-02 Bravo<br>Status: <span class="status-nonop">Inactive</span></div>
+                    <div class="item-card">L-03 Charlie<br>Status: <span class="status-launched">Active</span></div>
+                    <div class="item-card">L-04 Delta<br>Status: <span class="status-nonop">Inactive</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="swarm">
+            <h2>Swarm Health Status</h2>
+            <div class="panel">
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>Bayraktar TB2 (X) - 100% (In Flight)</span>
+                    <div class="progress-container"><div class="progress-bar" style="width: 100%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>MQ-9 Reaper (A) - 45% (Maintenance)</span>
+                    <div class="progress-container"><div class="progress-bar bar-yellow" style="width: 45%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>RQ-4 Global Hawk - 82% (Standby)</span>
+                    <div class="progress-container"><div class="progress-bar bar-yellow" style="width: 82%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>MQ-9 Reaper (B) - 5% (Destroyed)</span>
+                    <div class="progress-container"><div class="progress-bar bar-red" style="width: 5%"></div></div>
+                </div>
+                <div class="item-card" style="margin-bottom:15px">
+                    <span>Switchblade 300 - 5% (Detonated)</span>
+                    <div class="progress-container"><div class="progress-bar bar-red" style="width: 5%"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="log">
+            <h2>Flight & Event Logs</h2>
+            <div class="panel" style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Drone ID</th>
+                            <th>Time</th>
+                            <th>Event</th>
+                            <th>Data (WGS84 UTM)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="data">
+            <h2>Telemetry & Sensors</h2>
+            <div class="panel">
+                <div class="grid-list">
+                    <div class="item-card"><strong>Max Altitudine:</strong><br>25.400 ft</div>
+                    <div class="item-card"><strong>Max Speed:</strong><br>220 km/h</div>
+                    <div class="item-card"><strong>Current Absorption:</strong><br>45.2 A</div>
+                    <div class="item-card"><strong>GPS Satellite:</strong><br>14 Locked</div>
+                    <div class="item-card"><strong>Weather Cond.:</strong><br>Wind 12 Kts NE</div>
+                    <div class="item-card"><strong>Core Temperature:</strong><br>78.5 °C</div>
+                    <div class="item-card"><strong>Comm Link:</strong><br>Signal 98%</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings">
+            <h2>System Settings</h2>
+            <div class="panel" style="max-width: 400px; margin: auto;">
+                <button class="btn" onclick="toggleTheme()">1. Toggle Theme (Light/Dark)</button>
+                <button class="btn" onclick="fakeAction('Reset...')">2. Reset Communications</button>
+                <button class="btn" onclick="fakeAction('Sync...')">3. Data Sync</button>
+                <button class="btn" onclick="fakeAction('Reboot...')">4. System Reboot</button>
+                <p id="settingsFeedback" style="text-align:center; margin-top:10px; color: var(--warn-yellow);"></p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    // --- GESTIONE TAB SEMPLIFICATA ---
+    function showTab(tabId) {
+        document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        const btn = document.querySelector(`nav button[onclick*="${tabId}"]`);
+        if(btn) btn.classList.add('active');
+    }
+
+    // --- GESTIONE TEMA ---
+    function toggleTheme() {
+        const html = document.documentElement;
+        html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+
+    // --- FAKE BUTTONS SETTINGS ---
+    function fakeAction(msg) {
+        const f = document.getElementById('settingsFeedback');
+        f.innerText = msg;
+        setTimeout(() => f.innerText = "", 3000);
+    }
+
+    // --- CARICAMENTO LOG ---
+    async function loadLogs() {
+        const tbody = document.getElementById('logTableBody');
+        const fallbackData = [
+            {"id": "Bayraktar TB2", "time": "14:10:05", "event": "Entering Sector", "pos": "32T 471600E 5063400N", "status": "In Flight"},
+            {"id": "Bayraktar TB2", "time": "14:15:22", "event": "Scanning Area Red", "pos": "32T 472100E 5063800N", "status": "Launched"}
+        ];
+
+        try {
+            const r = await fetch('log.json');
+            const data = r.ok ? await r.json() : fallbackData;
+            renderTable(data, tbody);
+        } catch (e) {
+            renderTable(fallbackData, tbody);
+        }
+    }
+
+    function renderTable(d, c) {
+        c.innerHTML = d.map(r => `
+            <tr>
+                <td>${r.id}</td>
+                <td>${r.time}</td>
+                <td>${r.event}</td>
+                <td>${r.pos}</td>
+                <td class="${r.status.toLowerCase().includes('shot') ? 'status-abbattuto' : 'status-launched'}">${r.status}</td>
+            </tr>
+        `).join('');
+    }
+
+    window.onload = loadLogs;
+</script>
+</body>
+</html>
