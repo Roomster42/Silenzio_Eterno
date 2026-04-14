@@ -1,0 +1,86 @@
+[
+  {
+    "id": "Switchblade 300",
+    "time": "03:45:00",
+    "event": "Hitted",
+    "pos": "Flew Straight for 666m",
+    "status": "Damaged"
+  },
+  {
+    "id": "Switchblade 300",
+    "time": "03:45:10",
+    "event": "Start Auto-Destruction",
+    "pos": "Lost GPS Connection",
+    "status": "Damaged"
+  },
+   {
+    "id": "Switchblade 300",
+    "time": "03:45:15",
+    "event": "Destruction",
+    "pos": "Lost GPS Connection",
+    "status": "Detonated"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:12",
+    "event": "Takeoff",
+    "pos": "Direction 279.32° TN",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:28",
+    "event": "Flying",
+    "pos": "Flew Straight for 2529.5m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:28",
+    "event": "Turn",
+    "pos": "Direction 201.88° TN",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:42",
+    "event": "Flying",
+    "pos": "Flew Straight for 833m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:42",
+    "event": "Turn",
+    "pos": "Direction 137.12° TN",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:50",
+    "event": "Flying",
+    "pos": "Flew Straight for 1789.9m",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:50",
+    "event": "Turn",
+    "pos": "Direction 48.57° TN",
+    "status": "Operative"
+  },
+  {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:57",
+    "event": "Flying",
+    "pos": "Flew Straight for 1344m",
+    "status": "Operative"
+  },
+    {
+    "id": "Bayraktar TB2 (X)",
+    "time": "06:30:57",
+    "event": "Check GPS position",
+    "pos": "32T 0536557 5006684",
+    "status": "Operative"
+  }
+]
