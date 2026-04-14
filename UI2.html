@@ -309,7 +309,7 @@
         ];
 
         try {
-            const r = await fetch('log.json');
+            const r = await fetch('log2.json');
             const data = r.ok ? await r.json() : fallbackData;
             renderTable(data, tbody);
         } catch (e) {
