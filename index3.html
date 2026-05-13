@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Combat - Access Terminal</title>
+    <style>
+        :root {
+            --bg-base: #0a0e17;
+            --text-primary: #00ffcc;
+            --border-color: #00ffcc40;
+            --alert-red: #ff3333;
+            --warn-yellow: #ffcc00;
+            --font-main: 'Courier New', Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #loginBackground {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(10, 14, 23, 0.8), rgba(10, 14, 23, 0.95)), 
+                        url('https://images.unsplash.com/photo-1527977966376-1c8408f9f108?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            filter: grayscale(100%) contrast(120%);
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10;
+            background-color: rgba(17, 24, 39, 0.9);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.15);
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 { font-size: 1.6rem; margin-bottom: 5px; letter-spacing: 2px; }
+        .subtitle { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 25px; opacity: 0.7; }
+
+        .code-input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .code-input {
+            width: 80px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 1.4rem;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .code-input:focus { outline: none; border-color: var(--text-primary); box-shadow: 0 0 10px var(--text-primary); }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--text-primary);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-btn:hover:not(:disabled) { background: rgba(0, 255, 204, 0.2); }
+        .login-btn:disabled { color: #444; border-color: #444; cursor: not-allowed; }
+
+        #loginErrorMessage { color: var(--alert-red); margin-top: 15px; font-size: 0.9rem; min-height: 1.2em; }
+        #loginCountdown { color: var(--warn-yellow); margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="loginBackground"></div>
+
+    <div class="login-container">
+        <h1>UAV CONTROL LINK</h1>
+        <p class="subtitle">ENCRYPTED TERMINAL ACCESS</p>
+        
+        <div class="code-input-group">
+            <input type="text" class="code-input" id="codePart1" maxlength="4" placeholder="AAAA" autocomplete="off">
+            <span>-</span>
+            <input type="text" class="code-input" id="codePart2" maxlength="4" placeholder="0000" autocomplete="off">
+        </div>
+        
+        <button class="login-btn" id="loginBtn">AUTHENTICATE</button>
+        <p id="loginErrorMessage"></p>
+        <p id="loginCountdown">LOCKED. Retry in <span id="countdownTimer">30</span>s.</p>
+    </div>
+
+    <script>
+        const CORRECT_CODE_1 = "A1B2";
+        const CORRECT_CODE_2 = "C3D4";
+        let attempts = 0;
+
+        const input1 = document.getElementById('codePart1');
+        const input2 = document.getElementById('codePart2');
+        const btn = document.getElementById('loginBtn');
+        const err = document.getElementById('loginErrorMessage');
+
+        input1.addEventListener('input', () => { if(input1.value.length === 4) input2.focus(); });
+
+        btn.addEventListener('click', () => {
+            const c1 = input1.value.toUpperCase();
+            const c2 = input2.value.toUpperCase();
+
+            if (c1 === CORRECT_CODE_1 && c2 === CORRECT_CODE_2) {
+                err.style.color = 'var(--text-primary)';
+                err.innerText = "ACCESS GRANTED. REDIRECTING...";
+                setTimeout(() => {
+                    // Assicurati che UI.html sia nella stessa cartella
+                    window.location.href = 'UI.html';
+                }, 1000);
+            } else {
+                attempts++;
+                err.innerText = "ACCESS DENIED: INVALID CREDENTIALS.";
+                input1.value = ""; input2.value = ""; input1.focus();
+                if (attempts >= 3) lockOut();
+            }
+        });
+
+        function lockOut() {
+            btn.disabled = true;
+            input1.disabled = true;
+            input2.disabled = true;
+            document.getElementById('loginCountdown').style.display = 'block';
+            let time = 30;
+            const timer = setInterval(() => {
+                time--;
+                document.getElementById('countdownTimer').innerText = time;
+                if(time <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    input1.disabled = false;
+                    input2.disabled = false;
+                    document.getElementById('loginCountdown').style.display = 'none';
+                    err.innerText = "";
+                    attempts = 0;
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
